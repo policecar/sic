@@ -1,19 +1,18 @@
 
-function plot_420( YUV, ups )
+function plot_420( YUV, A_420, ups )
 
     figure,
-    %subplot(1,3,1), imshow(uint8(orig));  % show YUV ;)
     
-    oRGB = uint8(yuv2rgb(YUV));            % convert orig to RGB
-    subplot(1,3,1), imshow(oRGB);          % and show
+    % convert orig YUV to RGB and show
+    RGB = uint8(yuv2rgb(YUV));
+    subplot(1,3,1), imshow(RGB);
 
-    sUV = YUV;                             % show w/ subsampled U and V
-    sUV(:,:,2) = ups(:,:,2);
-    sUV(:,:,3) = ups(:,:,3);
-    sUV = uint8(yuv2rgb(sUV));
-    subplot(1,3,2), imshow(sUV);
+    % show A w/ subsampled U and V
+    A_420 = uint8(yuv2rgb(A_420));
+    subplot(1,3,2), imshow(A_420);
 
-    sY = YUV;                              % show w/ subsampled Y
+    % show A w/ subsampled Y
+    sY = YUV;
     sY(:,:,1) = ups(:,:,1);
     sY = uint8(yuv2rgb(sY));
     subplot(1,3,3), imshow(sY);

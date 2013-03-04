@@ -1,6 +1,8 @@
 
 function main(filename)
 
+    addpath('01_farbraeume');
+
     DATA_DIR = 'images/color/';
     OUTPUT_DIR = 'output/';
     fmt = 'tiff';
@@ -12,13 +14,13 @@ function main(filename)
     %imshow(A)
 
     % process image
-    A_rgb = double(A);                      % convert uint8 to double
-    A_yuv = rgb2yuv(A_rgb);                 % transform RGB to YUV
-    A_420 = chroma_subsampler_420(A_yuv);   % chroma subsampling 4:2:0
+    A_rgb = double(A);                  % convert uint8 to double
+    A_yuv = rgb2yuv(A_rgb);             % transform RGB to YUV
+    [A_420, up] = subsampler420(A_yuv); % chroma subsampling 4:2:0
 
     % visualize transformed image
     plot_yuv(A_yuv);
-    plot_420(A_yuv, A_420);
+    plot_420(A_yuv, A_420, up);
 
     % save image
     imwrite(A_yuv, strcat(OUTPUT_DIR, 'yuv_', filename), fmt);
