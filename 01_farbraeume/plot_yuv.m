@@ -1,7 +1,7 @@
 
 function plot_yuv( A )
-% PLOT_YUV      Separately transform each YUV channel of a 3-dimensional
-%               matrix to RGB color space and plot it.
+% PLOT_YUV      Separately transforms each YUV channel of a 3-dimensional
+%               matrix to RGB color space and plots it.
 
     figure,
     A_all = uint8(yuv2rgb(A));
