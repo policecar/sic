@@ -13,7 +13,7 @@ function B = bitplaneEncoder(A, cut)
     threshold = 2^(floor(log2(threshold)));
     
     % instantiate bit stream (to max required, cut off later on)
-    steps = log2(threshold);    % !? probably not correct
+    steps = ceil(log2(threshold) - log2(cut));  % correct !?
     B = zeros(numel(A) * steps * 2, 1);
     ix = 1;
     
@@ -37,7 +37,7 @@ function B = bitplaneEncoder(A, cut)
                    (thr == threshold || abs(A(i,j)) <= thr*2)
                     L_up(i,j) = 1;
                     % mark if value has been significant before
-                    % which is the case if it's > threshold
+                    % which is the case if it's value > threshold
                     if sign(A(i,j)) == -1
                         A_sig(i,j) = 3;
                     else
@@ -58,7 +58,7 @@ function B = bitplaneEncoder(A, cut)
                 % if entry is significant but not in current round, use
                 % refinement value, else use significance value
                 if L_up(i,j) == 1 && A_sig(i,j) == 0
-                    B(ix,:) = dec2bin(A_ref(i,j))';
+                    B(ix,:) = dec2bin(A_ref(i,j),1)';
                     ix = ix+1;
                 else
                     B(ix:ix+1,:) = dec2bin(A_sig(i,j),2)';
@@ -70,7 +70,7 @@ function B = bitplaneEncoder(A, cut)
         thr = thr/2;    % adapt threshold
 
     end
-    B = B(1:ix-1);
+    B = B(1:ix-1,:);
     
     % write idiomatic matlab version ?
        
