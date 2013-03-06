@@ -54,7 +54,7 @@ function main(fname)
         % encode matrix to bit plane encoding
         A_bpe = bitplaneEncoder(A(:,:,i), cut);
         % decode bit stream from bit plane decoding
-        A_bpd(:,:,i) = bitplaneDecoder(A_bpe);
+        A_bpd(:,:,i) = bitplaneDecoder(A_bpe, cut, size(A,1), size(A,2));
         % compute PSNR
         %peak = psnr(A_bpe);
     end

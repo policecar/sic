@@ -58,10 +58,12 @@ function B = bitplaneEncoder(A, cut)
                 % if entry is significant but not in current round, use
                 % refinement value, else use significance value
                 if L_up(i,j) == 1 && A_sig(i,j) == 0
-                    B(ix,:) = dec2bin(A_ref(i,j),1)';
+                    B(ix,:) = str2double(dec2bin(A_ref(i,j),1));
                     ix = ix+1;
                 else
-                    B(ix:ix+1,:) = dec2bin(A_sig(i,j),2)';
+                    tmp = dec2bin(A_sig(i,j),2)';
+                    B(ix,1) = str2double(tmp(1));
+                    B(ix+1,1) = str2double(tmp(2));
                     ix = ix+2;
                 end
                 
