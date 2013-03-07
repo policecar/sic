@@ -13,6 +13,7 @@ function B = bitplaneEncoder(A, cut)
     threshold = 2^(floor(log2(threshold)));
     n = numel(A);
     L_up = zeros(size(A));  % a look-up table to store significant entries
+    Aa = A; % matrix for refinement decisions
     
     % instantiate bit stream (to max required, cut off later on)
     steps = ceil(log2(threshold) - log2(cut));  % correct !?
@@ -42,25 +43,30 @@ function B = bitplaneEncoder(A, cut)
                 else
                     A_sig(i) = 2;
                 end
+                Aa(i) = Aa(i) - thr;
             end
 
             % refinement pass
             % if pixel has been significant but not in this round,
             % evaluate refinement
             if L_up(i) == 1 && A_sig(i) == 0
-                if A(i) >= thr    % !? might not be correct !?
+                % make it pretty: dissect number into powers of 2, check
+                % if log2(thr) is in that list
+                %if A(i) >= thr     % incorrect! but interesting enough
+                if Aa(i) >= thr
                     A_ref(i) = 1;
+                    Aa(i) = Aa(i) - thr;
                 end
             end
 
             % decide on bit stream value to transfer
-            % if entry is significant but not in current round, use
-            % refinement value, else use significance value
+            % if entry has been significant but not in current round, 
+            % use refinement value, else use significance value
             if L_up(i) == 1 && A_sig(i) == 0
                 B(ix,:) = A_ref(i);
                 ix = ix+1;
             else
-                % remember mapping: 0 -> 00, 1 -> 01, 2 -> 10, 3 -> 11
+                % reverse mapping: 0 -> 00, 1 -> 01, 2 -> 10, 3 -> 11
                 tmp = A_sig(i);
                 if tmp < 2
                     B(ix,1) = 0;
@@ -84,7 +90,6 @@ function B = bitplaneEncoder(A, cut)
         end
         thr = thr/2;    % adapt threshold
     end
-    toc
     B = B(1:ix-1,:);
        
 end
