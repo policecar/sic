@@ -6,6 +6,5 @@ function plot_bitplane(A, A_bpd)
 
     A_bpd = uint8(A_bpd);
     subplot(1,2,2), imshow(A_bpd);
-%     subplot(1,2,2), imshow(fliplr(flipdim(A_bpd,2)))    % for now!
 
 end
