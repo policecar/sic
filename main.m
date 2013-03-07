@@ -1,4 +1,3 @@
-
 function main(fname)
 %MAIN       Calls a day's code with the filename provided in fname if any.
 
@@ -54,27 +53,29 @@ function main(fname)
     A = double(A);  % convert uint8 to double
     %A = [3 -4; -10, 11];
     [m,n] = size(A);
-    cut = 32; % defaults to 1 for now
+    cuts = [32,16,8,4,2,1];
+    peak = zeros(size(cuts));
     threshold = max(max(A));
     A_bpd = zeros(size(A));
-    for i = 1:size(A,3)
-        % encode matrix to bit plane encoding
-        display('do bitplane encoding')
-        tic
-        A_bpe = bitplaneEncoder(A(:,:,i), cut);
-        toc
-        % decode bit stream from bit plane decoding
-        display('do bitplane decoding')
-        tic
-        A_bpd(:,:,i) = bitplaneDecoder(A_bpe, threshold, m, n);
-        toc
+    for j = 1:numel(cuts)
+        for i = 1:size(A,3)
+            % encode matrix to bit plane encoding
+            display('do bitplane encoding')
+            tic
+            A_bpe = bitplaneEncoder(A(:,:,i), cuts(j));
+            toc
+            % decode bit stream from bit plane decoding
+            display('do bitplane decoding')
+            tic
+            A_bpd(:,:,i) = bitplaneDecoder(A_bpe, threshold, m, n);
+            toc
+        end
         % compute PSNR
-%         peak = psnr(A_bpe);
+        peak(j) = psnr(A, A_bpd, threshold);
     end
     
     % visualize transformed image
-    plot_bitplane(A, A_bpd)
+    plot_bitplane(A, A_bpd, peak)
     
     % save image
 %     imwrite(A_bpd, strcat(OUTPUT_DIR, 'bpd_', filename), fmt)
-        
