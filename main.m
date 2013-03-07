@@ -11,7 +11,7 @@ function main(fname)
     end
 
     addpath('01_farbraeume');
-    addpath('03_bitplanecoding');
+    addpath('03_bitplanes');
 
     OUTPUT_DIR = 'output/';
     fmt = 'tiff';
@@ -28,8 +28,12 @@ function main(fname)
 % 
 %     % process image
 %     A_rgb = double(A);                  % convert uint8 to double
+%     tic
 %     A_yuv = rgb2yuv(A_rgb);             % transform RGB to YUV
+%     toc
+%     tic
 %     [A_420, up] = subsampler420(A_yuv); % chroma subsampling 4:2:0
+%     toc
 % 
 %     % visualize transformed image
 %     plot_yuv(A_yuv);
@@ -48,20 +52,29 @@ function main(fname)
     
     % process image
     A = double(A);  % convert uint8 to double
-    cut = 1;
+    %A = [3 -4; -10, 11];
+    [m,n] = size(A);
+    cut = 32; % defaults to 1 for now
+    threshold = max(max(A));
     A_bpd = zeros(size(A));
     for i = 1:size(A,3)
         % encode matrix to bit plane encoding
+        display('do bitplane encoding')
+        tic
         A_bpe = bitplaneEncoder(A(:,:,i), cut);
+        toc
         % decode bit stream from bit plane decoding
-        A_bpd(:,:,i) = bitplaneDecoder(A_bpe, cut, size(A,1), size(A,2));
+        display('do bitplane decoding')
+        tic
+        A_bpd(:,:,i) = bitplaneDecoder(A_bpe, threshold, m, n);
+        toc
         % compute PSNR
-        %peak = psnr(A_bpe);
+%         peak = psnr(A_bpe);
     end
     
     % visualize transformed image
     plot_bitplane(A, A_bpd)
     
     % save image
-    %imwrite(A_bpe, strcat(OUTPUT_DIR, 'bpe_', filename), fmt)
+%     imwrite(A_bpd, strcat(OUTPUT_DIR, 'bpd_', filename), fmt)
         
