@@ -38,6 +38,9 @@ function main(fname)
     A = imread(strcat(DATA_DIR, filename), fmt);
     
     % if image of color, convert to YUV first, process Y channel only
+    if size(A,3) > 1
+        A = rgb2yuv(A);
+    end
     A = A(:,:,1);
     
     % process image
