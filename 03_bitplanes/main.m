@@ -19,21 +19,21 @@ function main(fname)
     
     % process image
     A = double(A);  % convert uint8 to double
-    %A = [3 -4; -10, 11];
-    [m,n] = size(A);
+    %A = [183 -4; -10.2, 11.5];
     cuts = [128,64,32,16,8,4,2,1];
+    [m,n] = size(A);
     peak = zeros(size(cuts));
     threshold = max(max(A));
     A_bpd = zeros(size(A));
     for j = 1:numel(cuts)
         for i = 1:size(A,3)
             % encode matrix to bit plane encoding
-            display('do bitplane encoding')
+            display('Bit plane encoding')
             tic
             A_bpe = bitplaneEncoder(A(:,:,i), cuts(j));
             toc
             % decode bit stream from bit plane decoding
-            display('do bitplane decoding')
+            display('Bit plane decoding')
             tic
             A_bpd(:,:,i) = bitplaneDecoder(A_bpe, threshold, m, n);
             toc
