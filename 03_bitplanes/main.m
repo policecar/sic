@@ -21,7 +21,7 @@ function main(fname)
     A = double(A);  % convert uint8 to double
     %A = [3 -4; -10, 11];
     [m,n] = size(A);
-    cuts = [32,16,8,4,2,1];
+    cuts = [128,64,32,16,8,4,2,1];
     peak = zeros(size(cuts));
     threshold = max(max(A));
     A_bpd = zeros(size(A));
@@ -43,9 +43,9 @@ function main(fname)
     end
     
     % visualize transformed image
-    plot_bitplane(A, A_bpd, peak)
+    plot_bitplane(A, A_bpd, peak, cuts, threshold)
     
     % save image
-%     imwrite(A_bpd, strcat(OUTPUT_DIR, 'bpd_', filename), fmt)
+    imwrite(A_bpd, strcat(OUTPUT_DIR, 'bpd_', filename), fmt)
 
 end

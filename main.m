@@ -15,32 +15,18 @@ function main(fname)
     OUTPUT_DIR = 'output/';
     fmt = 'tiff';
 
-
-%     %% day 1
 %     DATA_DIR = 'images/color/';
 % 
 %     % open image
 %     A = imread(strcat(DATA_DIR, filename), fmt);
 % 
-%     % visualize original image
-%     %imshow(A)
-% 
 %     % process image
 %     A_rgb = double(A);                  % convert uint8 to double
-%     tic
 %     A_yuv = rgb2yuv(A_rgb);             % transform RGB to YUV
-%     toc
-%     tic
 %     [A_420, up] = subsampler420(A_yuv); % chroma subsampling 4:2:0
-%     toc
-% 
-%     % visualize transformed image
-%     plot_yuv(A_yuv);
-%     plot_420(A_yuv, A_420, up);
 % 
 %     % save image
 %     imwrite(A_yuv, strcat(OUTPUT_DIR, 'yuv_', filename), fmt);
-%     imwrite(A_420, strcat(OUTPUT_DIR, '420_', filename), fmt);
 
 
     %% day 3
@@ -53,7 +39,7 @@ function main(fname)
     A = double(A);  % convert uint8 to double
     %A = [3 -4; -10, 11];
     [m,n] = size(A);
-    cuts = [32,16,8,4,2,1];
+    cuts = [128,64,32,16,8,4,2,1];
     peak = zeros(size(cuts));
     threshold = max(max(A));
     A_bpd = zeros(size(A));
@@ -75,7 +61,9 @@ function main(fname)
     end
     
     % visualize transformed image
-    plot_bitplane(A, A_bpd, peak)
+    plot_bitplane(A, A_bpd, peak, cuts, threshold)
     
     % save image
-%     imwrite(A_bpd, strcat(OUTPUT_DIR, 'bpd_', filename), fmt)
+    imwrite(A_bpd, strcat(OUTPUT_DIR, 'bpd_', filename), fmt)
+
+end
