@@ -24,7 +24,8 @@ function B = bitplaneEncoder(A, cut)
     % instantiate bit stream (to max required, cut off later on)
     steps = ceil(log2(threshold) - log2(cut));  % correct !?
     B = zeros(numel(A) * steps * 2, 1);
-    ix = 1;
+    ix = 1;     % index in bit stream
+    idx = 1:n;  % order of matrix traversal, by column for now
     
     thr = threshold;
     
@@ -35,37 +36,40 @@ function B = bitplaneEncoder(A, cut)
       
         A_sig = zeros(size(A)); % instantiate matrix for significance val.
         A_ref = zeros(size(A)); % instantiate matrix for refinement values
-        i = 1; 
-        while i <= n
+        i = 1;
+        while i <= numel(idx)
+            
+            % retrieve actual i value from idx(i)
+            j = idx(i);
 
             % significance pass
-            if (abs(A(i)) > thr) && ...
+            if (abs(A(j)) > thr) && ...
                (thr == threshold || abs(A(i)) <= thr*2)
-                L_up(i) = 1; % mark significant entries
+                L_up(j) = 1; % mark significant entries
                 % encode encountered value, cf. temporary coding above
-                if sign(A(i)) == -1
-                    A_sig(i) = 3;
+                if sign(A(j)) == -1
+                    A_sig(j) = 3;
                 else
-                    A_sig(i) = 2;
+                    A_sig(j) = 2;
                 end
-                Aa(i) = Aa(i) - thr; % subtract current threshold
+                Aa(j) = Aa(j) - thr; % subtract current threshold
             end
 
             % refinement pass
             % if pixel has been significant before but not in this round,
             % evaluate and send refinement, else send significance value
-            if L_up(i) == 1 && A_sig(i) == 0
+            if L_up(j) == 1 && A_sig(j) == 0
                 % make it pretty: dissect number into powers of 2, check
                 % if log2(thr) is in that list
-                if Aa(i) >= thr
-                    A_ref(i) = 1;
-                    Aa(i) = Aa(i) - thr;
+                if Aa(j) >= thr
+                    A_ref(j) = 1;
+                    Aa(j) = Aa(j) - thr;
                 end
-                B(ix,:) = A_ref(i);
+                B(ix,:) = A_ref(j);
                 ix = ix+1;
             else
                 % reverse temporary mapping, cf. temporary coding above
-                tmp = A_sig(i);
+                tmp = A_sig(j);
                 if tmp < 2
                     B(ix,1) = 0;
                     if tmp == 0
@@ -81,7 +85,7 @@ function B = bitplaneEncoder(A, cut)
                         B(ix+1,1) = 1;
                     end
                 end
-                ix = ix+2;                
+                ix = ix+2;             
             end
             i = i+1;
         end
