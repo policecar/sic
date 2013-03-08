@@ -14,7 +14,7 @@ Run
 
 in MatLab run
 
-    $ main
+    >> main
 
 
 Author
