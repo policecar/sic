@@ -33,33 +33,33 @@ function main(fname)
 
     %% day 3
     DATA_DIR = 'images/gray/';
-    %DATA_DIR = 'images/color/';
     
     % load image
     A = imread(strcat(DATA_DIR, filename), fmt);
+    
+    % if image of color, convert to YUV first, process Y channel only
+    A = A(:,:,1);
     
     % process image
     A = double(A);  % convert uint8 to double
     %A = [183 -4; -10.2, 11.5];
     cuts = [128,64,32,16,8,4,2,1];
     %cuts = [64];
-    sz = size(A);
+    [m,n] = size(A);
     peak = zeros(size(cuts));
-    A_bpd = zeros(sz);
+    A_bpd = zeros(size(A));
     for j = 1:numel(cuts)
-        for i = 1:size(A,3) % (don't use sz(3), will throw error)
-            % encode matrix to bit plane encoding
-            display('Bit plane encoding')
-            tic
-            Bs = bitplaneEncoder(A(:,:,i), cuts(j));
-            toc
-            % decode bit stream from bit plane decoding
-            display('Bit plane decoding')
-            tic
-            threshold = max(max(A(:,:,i)));
-            A_bpd(:,:,i) = bitplaneDecoder(Bs, threshold, sz(1), sz(2));
-            toc
-        end
+        % encode matrix to bit plane encoding
+        display('Bit plane encoding')
+        tic
+        Bs = bitplaneEncoder(A(:,:), cuts(j));
+        toc
+        % decode bit stream from bit plane decoding
+        display('Bit plane decoding')
+        tic
+        threshold = max(max(A(:,:)));
+        A_bpd(:,:) = bitplaneDecoder(Bs, threshold, m, n);
+        toc
         % compute PSNR
         peak(j) = psnr(A, A_bpd, threshold);
     end
