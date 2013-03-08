@@ -14,7 +14,7 @@ function plot_bitplane(A, A_bpd, peak, cuts, threshold)
     figure, plot(peak,'x-g');
     title('Peak Signal-to-Noise Ratio')
     xlabel('Number of planes'), 
-    ylabel('Peak SNR')
+    ylabel('Peak SNR in dB')
     set(gca,'YScale','log')
     xticks = (ceil(log2(threshold))) - log2(cuts);
     xticklabels = textscan(num2str(xticks),'%s');
