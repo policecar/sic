@@ -10,8 +10,8 @@ function main(fname)
         filename = fname;
     end
 
-    addpath('01_farbraeume');
-    addpath('03_bitplanes');
+    addpath('farbraeume');
+    addpath('bitplanes');
 
     DATA_DIR = 'images/color/';
     %DATA_DIR = 'images/gray/';
