@@ -32,25 +32,24 @@ function main(fname)
     % RGB to YUV transformation
     A_yuv = rgb2yuv(A_rgb);
     
-%     % chroma subsampling 4:2:0
-%     tic, [A_sub, A_up] = subsampling420(A_yuv); toc
-%     
-%     % bit plane coding
-%     A_y = A_yuv(:,:,1);     % process only the Y channel
-%     [m,n] = size(A_y);
-%     threshold = max(A_y(:));
-%     %cut = [128,64,32,16,8,4,1];
-%     cut = [1];
-%     peak = zeros(size(cut));
-%     for c = 1:numel(cut)
-%         tic, Bs = bitplaneEncoding(A_y, cut(c)); toc
-%         tic, A_bp = bitplaneDecoding(Bs, threshold, m, n); toc
-%         peak(c) = psnr(A_yuv(:,:,1), A_bp, threshold);
-%     end
+    % chroma subsampling 4:2:0
+    tic, [A_sub, A_up] = subsampling420(A_yuv); toc
+    
+    % bit plane coding
+    numIter = 7;
+    tic,
+    Bs = BitplaneEncoding(A_yuv(:,:,1), A_yuv(:,:,2), A_yuv(:,:,3), ...
+        numIter);
+    toc
+    tic, A_bp = BitplaneDecoding(Bs); toc
     
     % wavelet transformation
     A_haar = haarEncoding(A_yuv(:,:,1));
-    A_unhaar = haarDecoding(A_haar);
+    A_h = haarDecoding(A_haar);
+
+    
+    % analysis
+    % eg. psnr for different numbers of iteration in bitplane coding
 
     
     % make some plots and save them to disc
@@ -65,10 +64,10 @@ function main(fname)
     %plot_psnr(peak, threshold, cut)
     %saveas(gcf, strcat(OUTPUT_DIR, fn, '_psnr'), 'png')
     %
-    %plot_day5(A, A_yuv, A_bp, A_sub),
+    %plot_day5(A, A_yuv, A_bp),
     %saveas(gcf, strcat(OUTPUT_DIR, fn, '_day5'), 'png')
     %
-    plot_day6(A_yuv, A_unhaar),
+    plot_day6(A_yuv, A_haar, A_h),
     saveas(gcf, strcat(OUTPUT_DIR, fn, '_day6'), 'png')  
         
     %stats = profile('info');

@@ -100,11 +100,10 @@ function B = BitplaneEncoding(C1, C2, C3, maxIter)
                     ix = ix+2;
                 end
             end
-            th(k) = th(k) /2;   % update threshold
+            th(k) = th(k) /2; % update threshold
         end
     end
     B = B(1:ix-1,:);
-    
 end
 
 
