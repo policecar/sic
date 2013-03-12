@@ -34,8 +34,7 @@ function A = BitplaneDecoding(B)
             cnt = cnt+1;
             for c = 1:n % for every pixel
 
-                % if current bit belongs to pixel that wasn't significant 
-                % yet, read two (significance) bits
+                % if pixels wasn't significant yet, read two bits
                 if L_up(k,c) == 0
                     if B(b) == 0
                         % if B(b+1) == 0, do nothing bc we zeroed above

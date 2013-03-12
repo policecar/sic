@@ -5,7 +5,7 @@ function B = BitplaneEncoding(C1, C2, C3, maxIter)
 
     % bit stream symbols:
     %   00    insignificant
-    %   01    unknown as yet
+    %   01    zero tree (unused as yet)
     %   10    significant and positive 
     %   11    significant and negative
     
@@ -42,12 +42,9 @@ function B = BitplaneEncoding(C1, C2, C3, maxIter)
 
                 j = idx(i); % retrieve actual index
 
-                % if significant, send resp. significance bits
-                % val has not been larger threshold before and is larger
-                % than threshold now
-                if A(k,j) == Aa(k,j), % if has not been significant
-                %if maxIter == 1 || abs(A(k,j)) <= t*2
-                    if abs(A(k,j)) >= t, % if is significant now
+                % if pixel is significant, send two significance bits
+                if A(k,j) == Aa(k,j), % if pixel has not been significant
+                    if abs(A(k,j)) >= t, % if pixel is significant now
                         B(ix) = 1;
                         if sign(A(k,j)) == -1, % if value is sub-zero
                             B(ix+1) = 1;
@@ -61,6 +58,7 @@ function B = BitplaneEncoding(C1, C2, C3, maxIter)
                         B(ix+1) = 0;
                     end
                     ix = ix+2;
+                % else send a single refinement bit
                 elseif abs(A(k,j)) > abs(Aa(k,j))+t,
                     if abs(Aa(k,j)) >= t,
                         B(ix) = 1;
