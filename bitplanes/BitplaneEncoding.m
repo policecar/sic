@@ -9,12 +9,6 @@ function B = BitplaneEncoding(C1, C2, C3, maxIter)
     %   10    significant and positive 
     %   11    significant and negative
     
-    % temporary significance coding:
-    %   0     -> 00
-    %   1     -> 01
-    %   2     -> 10
-    %   3     -> 11
-
     % (note: function signature is heteronomous)
     % merge channels into single matrix 
     A(1,:,:) = C1; A(2,:,:) = C2; A(3,:,:) = C3;
@@ -34,19 +28,13 @@ function B = BitplaneEncoding(C1, C2, C3, maxIter)
         ix = ix + ib;
     end
     
-    % instantiate some helper matrices
-    L_up = zeros(size(A));  % look-up table to store significant entries
-    Aa = A;                 % matrix to store shaved entry values
-
+    Aa = A;         % a helper matrix to store shaved entry values
     idx = 1:m*n;    % order of matrix traversal, by column for now
-    thr = th;       % need this for significance pass check
     
     for it = 1:maxIter % for every threshold
         for k = 1:d % for each of the channels in turn
             
             t = th(k);
-            A_sig = zeros(size(A)); % helper matrix for significance pass
-            A_ref = zeros(size(A)); % helper matrix for refinement pass
 
             for i = 1:numel(idx) % for every pixel
 
@@ -54,50 +42,37 @@ function B = BitplaneEncoding(C1, C2, C3, maxIter)
 
                 j = idx(i); % retrieve actual index
 
-                % significance pass
-                if (abs(A(k,j)) > t) && ...
-                   (t == thr(k) || abs(A(k,j)) <= t*2)
-                    L_up(k,j) = 1; % mark as significant
-                    % encode encountered value, cf. temporary coding above
-                    if sign(A(k,j)) == -1
-                        A_sig(k,j) = 3;
-                    else
-                        A_sig(k,j) = 2;
-                    end
-                    Aa(k,j) = Aa(k,j) - t; % subtract current threshold
-                end
-
-                % refinement pass
-                % if pixel has been significant before but not in this round,
-                % evaluate and send refinement, else send significance value
-                if L_up(k,j) == 1 && A_sig(k,j) == 0
-                    % make it pretty: dissect number into powers of 2, check
-                    % if log2(thr) is in that list
-                    if Aa(k,j) >= t
-                        A_ref(k,j) = 1;
-                        Aa(k,j) = Aa(k,j) - t;
-                    end
-                    B(ix,:) = A_ref(k,j);
-                    ix = ix+1;
-                else
-                    % reverse temporary mapping, cf. temporary coding above
-                    tmp = A_sig(k,j);
-                    if tmp < 2
-                        B(ix,1) = 0;
-                        if tmp == 0
-                            B(ix+1,1) = 0;
+                % if significant, send resp. significance bits
+                % val has not been larger threshold before and is larger
+                % than threshold now
+                if A(k,j) == Aa(k,j), % if has not been significant
+                %if maxIter == 1 || abs(A(k,j)) <= t*2
+                    if abs(A(k,j)) >= t, % if is significant now
+                        B(ix) = 1;
+                        if sign(A(k,j)) == -1, % if value is sub-zero
+                            B(ix+1) = 1;
+                            Aa(k,j) = Aa(k,j) + t;
                         else
-                            B(ix+1,1) = 1;
+                            B(ix+1) = 0;
+                            Aa(k,j) = Aa(k,j) - t;
                         end
                     else
-                        B(ix,1) = 1;
-                        if tmp == 2
-                            B(ix+1,1) = 0;
-                        else
-                            B(ix+1,1) = 1;
-                        end
+                        B(ix) = 0;
+                        B(ix+1) = 0;
                     end
                     ix = ix+2;
+                elseif abs(A(k,j)) > abs(Aa(k,j))+t,
+                    if abs(Aa(k,j)) >= t,
+                        B(ix) = 1;
+                        if sign(A(k,j)) == -1,
+                            Aa(k,j) = Aa(k,j) + t;
+                        else
+                            Aa(k,j) = Aa(k,j) - t;
+                        end
+                    else
+                        B(ix) = 0;
+                    end
+                    ix = ix+1;
                 end
             end
             th(k) = th(k) /2; % update threshold
