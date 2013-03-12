@@ -35,6 +35,10 @@ function main(fname)
     % chroma subsampling 4:2:0
     tic, [A_sub, A_up] = subsampling420(A_yuv); toc
     
+    % wavelet transformation
+    T = DWTEncoder(A_yuv(:,:,1), 1);
+    Y = DWTDecoder(T, 1);
+
     % bit plane coding
     numIter = 7;
     tic,
@@ -43,10 +47,6 @@ function main(fname)
     toc
     tic, A_bp = BitplaneDecoding(Bs); toc
     
-    % wavelet transformation
-    A_haar = haarEncoding(A_yuv(:,:,1));
-    A_h = haarDecoding(A_haar);
-
     
     % analysis
     % eg. psnr for different numbers of iteration in bitplane coding
@@ -67,7 +67,7 @@ function main(fname)
     %plot_day5(A, A_yuv, A_bp),
     %saveas(gcf, strcat(OUTPUT_DIR, fn, '_day5'), 'png')
     %
-    plot_day6(A_yuv, A_haar, A_h),
+    plot_day6(A_yuv, T, Y),
     saveas(gcf, strcat(OUTPUT_DIR, fn, '_day6'), 'png')  
         
     %stats = profile('info');
