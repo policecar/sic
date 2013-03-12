@@ -1,5 +1,5 @@
 
-function T = haarEncoding(X)
+function T = HaarEncoding(X)
 %HAARENCODING   Discrete Wavelet Transformation of a 2-D image (encoding).
 
     % define the Haar wavelet

@@ -1,4 +1,4 @@
-function p = psnr(A, A_bp, threshold)
+function p = PSNR(A, A_bp, threshold)
 %PSNR       Computes the Peak Signal-to-Noise ratio (PSNR)
 
     n = numel(A);
