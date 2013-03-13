@@ -1,7 +1,7 @@
 
 function B = BitplaneEncoding(C1, C2, C3, maxIter)
 %BITPLANEENCODER    Bit-Plane codes an image given in 3 separate channels 
-%                   and returns its bit stream.
+%                   and returns their (intertwined) bit stream.
 
     % bit stream symbols:
     %   00    insignificant
@@ -17,8 +17,8 @@ function B = BitplaneEncoding(C1, C2, C3, maxIter)
     
     % instantiate bitstream (to max required, cut off later on)
     ib = 3* 8;  % number of info bits per channel
-    B = zeros(ib *3 + numel(A) *2 *maxIter, 1);  % length of info + data
-    ix = 1;  % current index in bitstream
+    B = zeros(ib *d + numel(A) *2 *maxIter, 1);  % length of info + data
+    ix = 1;     % current index in bitstream
     
     % write info to bitstream
     for k = 1:d
@@ -35,7 +35,6 @@ function B = BitplaneEncoding(C1, C2, C3, maxIter)
         for k = 1:d % for each of the channels in turn
             
             t = th(k);
-
             for i = 1:numel(idx) % for every pixel
 
                 % write data to bit stream
@@ -81,7 +80,7 @@ end
 
 
 function info = getBitstreamInfo(Chan, th)
-%GETBITSTREAMINFO   Returns an 8-bit representation of width, height and 
+%GETBITSTREAMINFO   Returns 8-bit representations of width, height and 
 %                   threshold of a given 2-D image channel.
     
     [~, m, n] = size(Chan);
