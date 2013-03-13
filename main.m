@@ -36,8 +36,10 @@ function main(fname)
     tic, [A_sub, A_up] = subsampling420(A_yuv); toc
     
     % wavelet transformation
-    T = DWTEncoder(A_yuv(:,:,1), 1);
-    Y = DWTDecoder(T, 1);
+    %T_haar = DWTEncoder(A_yuv(:,:,1), 0);
+    %Y_haar = DWTDecoder(T_haar, 0);    
+    T_fbi = DWTEncoder(A_yuv(:,:,1), 1);
+    Y_fbi = DWTDecoder(T_fbi, 1);
 
     % bit plane coding
     numIter = 7;
@@ -50,6 +52,7 @@ function main(fname)
     
     % analysis
     % eg. psnr for different numbers of iteration in bitplane coding
+    % mittlere energiekonzentration
 
     
     % make some plots and save them to disc
@@ -67,7 +70,7 @@ function main(fname)
     %plot_day5(A, A_yuv, A_bp),
     %saveas(gcf, strcat(OUTPUT_DIR, fn, '_day5'), 'png')
     %
-    plot_day6(A_yuv, T, Y),
+    plot_day6(A_yuv, T_fbi, Y_fbi),
     saveas(gcf, strcat(OUTPUT_DIR, fn, '_day6'), 'png')  
         
     %stats = profile('info');
