@@ -1,21 +1,21 @@
 
 function A = BitplaneDecoding(B)
 %BITPLANEDECODER    Decodes a given bit stream B in Bit Plane Coding to a 
-%                   2-dimensional matrix and returns that matrix.
+%                   3-dimensional matrix and returns that matrix.
 
     % bit stream symbols:
     %   00    insignificant
-    %   01    unknown as yet
+    %   01    zero tree (unused yet)
     %   10    significant and positive 
     %   11    significant and negative
     
     % instantiate some helper variables
-    d = 3; % apparently I need to know the dimensionality of the image
-    w = zeros(d,1);
-    h = zeros(d,1);
-    th = zeros(d,1);
+    d = 3;              % number of channels
+    w = zeros(d,1);     % widthes
+    h = zeros(d,1);     % heights
+    th = zeros(d,1);    % thresholds
     
-    % parse bitstream info for each of the three channels
+    % parse bitstream info for each of the channels
     ib = 3* 8;  % number of info bits per channel
     for k = 1:d
         [w(k), h(k), th(k)] = parseBitstreamInfo(B, ib);
@@ -23,44 +23,40 @@ function A = BitplaneDecoding(B)
     end
     
     % instantiate more helper variables
-    n = w(1) * h(1); % assuming all channels share dimensionality
+    n = w(1) * h(1);        % assuming all channels share dimensionality
     A = zeros(d, w(1), h(1));
-    L_up = zeros(size(A));
+    L_up = zeros(size(A));  % a look-up matrix which stores significance
 
     b = 1;
-    cnt = 0;
     while b <= (numel(B) - 3*n) % for every bit in the stream
         for k = 1:d % for every channel in turn
-            cnt = cnt+1;
             for c = 1:n % for every pixel
 
-                % if pixels wasn't significant yet, read two bits
+                % if pixel is significant, read two significance bits
                 if L_up(k,c) == 0
-                    if B(b) == 0
-                        % if B(b+1) == 0, do nothing bc we zeroed above
-                        if B(b+1) == 1
-                            % do nothing for now bc we're not using 01 yet
+                    if B(b) == 0,
+                        % if B(b+1) ==0, L_up(k,c) = 0; end  << implicitly
+                        if B(b+1) == 1,
+                            % do nothing yet
                         end
-                    else    % if B(b) == 1
+                    else
                         if B(b+1) == 0
                             L_up(k,c) = 1;
-                        else    % if B(b+1) == 1
+                        else
                             L_up(k,c) = -1;
                         end
                         A(k,c) = th(k);
                     end
                     b = b+2;
-                % elseif bit belongs to pixel that has been significant 
-                % before, read one (refinement) bit
+                % elseif pixel has been significant, read a refinement bit
                 else
-                    if B(b) ~= 0
+                    if B(b) == 1
                         A(k,c) = A(k,c) + th(k);
                     end
                     b = b+1;
                 end
-%                 if b >= numel(B), break; end  % !?
             end
-            th(k) = th(k) /2;       % adjust channel-specific threshold
+            th(k) = th(k) /2; % adjust channel-specific threshold
         end
     end
     
@@ -74,7 +70,7 @@ end
 
 function [w,h,th] = parseBitstreamInfo(bitstream, ib)
 %GETBITSTREAMINFO   Returns width, height and threshold of a given 2-D
-%                   image channel from its 8-bit representation.
+%                   image channel from their 8-bit representations.
     
     bpi = ib /3;
     w  = 2^ bin2dec(num2str(bitstream(1:bpi)'));
