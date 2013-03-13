@@ -8,7 +8,7 @@ function zzidx = zigzag(idx)
     A = reshape(idx,sz,sz);
     zzidx = zeros(size(idx));
     
-    % process top right pixel first
+    % always start with top left pixel
     zzidx(1) = 1;
     
     z = 1;
@@ -25,7 +25,7 @@ function zzidx = zigzag(idx)
             for c = 1:z,
                 for r = 1:z,
                     zzidx(i) = sub(j,r,c);
-                    i = i + 1;
+                    i = i+1;
                 end
             end
         end
