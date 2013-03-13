@@ -8,7 +8,7 @@ function T = HaarDecoding(T)
     lp = [v;  v];   % Haar scaling function < low pass filter
     hp = [v; -v];   % Haar wavelet function < high pass filter
 
-    % iteratively until size(X) = [2,2], do
+    % iteratively until n = size(T,1), do
     n = 2;
     while n <= size(T,1)
 
