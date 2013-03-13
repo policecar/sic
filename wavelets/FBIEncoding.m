@@ -1,10 +1,10 @@
 
 function T = FBIEncoding(X)
 %FBIENCODING    Discrete Wavelet Transformation of a 2-D image (encoding).
-%               using the Debauchies wavelet.
+%               using the Daubechies wavelet.
 
     % fetch filters
-    [a, d, ~, ~] = DebauchiesWavelet();
+    [a, d, ~, ~] = DaubechiesWavelet();
     
     T = zeros(size(X));
     
@@ -12,27 +12,26 @@ function T = FBIEncoding(X)
     [~, n] = size(X);
     while n >= 2
     
-        % symmetrically convolute X with filter a or d
-        LP = sconv(a, X); %  low pass  > T(1:m,1:n) w/ m = n/2
-        HP = sconv(d, X); % high pass  > T(m+1:n,1:n)
-
-        LL = sconv(a, LP);
-        LH = sconv(d, LP);
-        HL = sconv(a, HP);
-        HH = sconv(d, HP);
+        % symmetrically convolute X with analysis filters a and d
+        LP = sconv(a, X); % low pass
+        HP = sconv(d, X); % high pass
         
-        % subsample
-        LL = LL(2:2:end,2:2:end);
-        LH = LH(2:2:end,1:2:end);
-        HL = HL(1:2:end,2:2:end);
-        HH = HH(1:2:end,1:2:end);
+        % transpose and convolute again
+        LL = sconv(a, LP');
+        LH = sconv(d, LP');
+        HL = sconv(a, HP');
+        HH = sconv(d, HP');
+        
+        % subsample and transpose back
+        LL = LL(2:2:end,2:2:end)';
+        LH = LH(1:2:end,2:2:end)';
+        HL = HL(2:2:end,1:2:end)';
+        HH = HH(1:2:end,1:2:end)';
+        
         T(1:n,1:n) = [LL,LH;HL,HH];
                 
         % update
         n = n /2;
         X = T(1:n,1:n);
-
     end
 end
-
-
