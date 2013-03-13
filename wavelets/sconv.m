@@ -8,6 +8,7 @@ function h = sconv(f,g)
     ext = floor(len /2);
     
     % if filter f exceeds size of matrix g, cut it on both ends
+    % 
     if ext >= size(g,2),
         k = size(g,2) - 1;  % size of mirror-able part
         ctr = ceil(len /2); % the filter's center (assuming odd-length)
@@ -16,14 +17,14 @@ function h = sconv(f,g)
     end
     
     % symmetrically extend g by half the length of f
-    lext = fliplr(g(:,1:ext));
-    rext = fliplr(g(:,end-ext:end));
+    lext = fliplr(g(:,2:ext+1));
+    rext = fliplr(g(:,end-ext:end-1));
     g = [lext, g, rext];
 
     % symmetrically convolute g with f
     h = conv2(f,g);
 
     % remove symmetric extensions as well as matlab 0 cushioning
-    h = h(:,2*ext+1:end-2*ext-1);
+    h = h(:,1+2*ext:end-2*ext);
 
 end
