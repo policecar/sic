@@ -24,5 +24,3 @@ Priska Herger
 
 License
 -------
-License: [GNU GPLv3][1]
-[1]: http://www.gnu.org/licenses/gpl.html
