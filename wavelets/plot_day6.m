@@ -10,7 +10,8 @@ function plot_day6(A_yuv, T, Y)
     title('Wavelet transformed image')
         
     A_diff = A_yuv(:,:,1) - Y;
-    subplot(1,3,3), imagesc(A_diff),
+    subplot(1,3,3), imshow(uint8(A_diff)),
+    %subplot(1,3,3), imagesc(A_diff),
     title('Diff b/w Y and original')
     
 end
