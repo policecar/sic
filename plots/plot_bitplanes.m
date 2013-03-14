@@ -1,7 +1,6 @@
 
-function plot_bitplanes(BP)
-%PLOT_BITPLANES     Given the bit planes of an images as 4-D matrix, plot
-%                   them in succession.
+function plot_bitplanes(YUV, BP)
+%PLOT_BITPLANES     Given and image and its bit plane codings, plot them.
 
     figure,
     title('Bit plane coding'),
@@ -9,6 +8,7 @@ function plot_bitplanes(BP)
     % helper variables
     k = 1;              % plot only the Y channel
     j = size(BP,2);     % number of bit planes
+    BP(k,1,:,:) = YUV(:,:,1);
     
     for i = 1:j;
         subplot(2,j/2,i), imshow(uint8(squeeze(BP(k,j-i+1,:,:))));
