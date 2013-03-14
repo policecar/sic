@@ -1,6 +1,6 @@
 function [B, up] = subsampling420(A)
-%CHROMA_SUBSAMPLER_420  Chroma subsamples an image given as 3-D matrix in 
-%                       YUV color space in a ratio of 4:2:0.
+%SUBSAMPLING_420    Chroma-subsamples an image given as 3-D matrix in YUV 
+%                   color space at a ratio of 4:2:0.
 
     B = zeros(size(A));
     
