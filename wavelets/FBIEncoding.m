@@ -16,19 +16,19 @@ function T = FBIEncoding(X)
         LP = sconv(a, X); % low pass
         HP = sconv(d, X); % high pass
         
-        % transpose and convolute again
-        LL = sconv(a, LP');
-        LH = sconv(d, LP');
-        HL = sconv(a, HP');
-        HH = sconv(d, HP');
+        % transpose, convolute again, transpose again
+        LL = sconv(a, LP')';
+        HL = sconv(a, HP')';
+        LH = sconv(d, LP')';
+        HH = sconv(d, HP')';
         
-        % subsample and transpose back
-        LL = LL(2:2:end,2:2:end)';
-        LH = LH(1:2:end,2:2:end)';
-        HL = HL(2:2:end,1:2:end)';
-        HH = HH(1:2:end,1:2:end)';
-        
-        T(1:n,1:n) = [LL,LH;HL,HH];
+        % subsample
+        LL = LL(1:2:end,1:2:end);
+        HL = HL(2:2:end,1:2:end);
+        LH = LH(1:2:end,2:2:end);
+        HH = HH(2:2:end,2:2:end);
+
+        T(1:n,1:n) = [LL,HL;LH,HH];
         
         % update
         n = n /2;
