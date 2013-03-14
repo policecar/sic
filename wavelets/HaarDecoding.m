@@ -12,7 +12,6 @@ function T = HaarDecoding(T)
     n = 2;
     while n <= size(T,1)
 
-        tic
         % construct resp. Haar transform
         H = zeros([n, n]);
         m = n/2;
@@ -28,7 +27,6 @@ function T = HaarDecoding(T)
         
         % update
         n = n *2;
-        toc
         
     end
 end

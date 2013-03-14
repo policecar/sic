@@ -14,7 +14,6 @@ function T = HaarEncoding(X)
     [~, n] = size(X);
     while n >= 2
        
-        tic
         % construct resp. Haar transform
         H = zeros([n, n]);
         m = n/2;
@@ -32,7 +31,6 @@ function T = HaarEncoding(X)
         % update
         n = n /2;
         X = T(1:n,1:n);
-        toc
         
     end
 end
