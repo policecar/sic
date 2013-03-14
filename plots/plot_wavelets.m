@@ -17,6 +17,6 @@ function plot_wavelets(YUV, Y_enc, Y_dwt)
         
     Diff = Y - Y_dwt;
     subplot(1,4,4), imshow(uint8(Diff)),
-    title('Diff b/w Y and Y_dwt')
+    title('Diff b/w Y and Y\_dwt')
     
 end
