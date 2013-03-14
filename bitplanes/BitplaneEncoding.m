@@ -1,7 +1,8 @@
 
 function B = BitplaneEncoding(C1, C2, C3, maxIter)
-%BITPLANEENCODER    Bit-Plane codes an image given in 3 separate channels 
-%                   and returns their (intertwined) bit stream.
+%BITPLANEENCODER    Given 3 separate channels of an image and the number of 
+%                   bit planes to code, performs bit plane encoding and
+%                   produces an (intertwined) bitstream.
 
     % bit stream symbols:
     %   00    insignificant
@@ -58,7 +59,7 @@ function B = BitplaneEncoding(C1, C2, C3, maxIter)
                     end
                     ix = ix+2;
                 % else send a single refinement bit
-                elseif abs(A(k,j)) > abs(Aa(k,j))+t,
+                elseif abs(A(k,j)) > abs(Aa(k,j)) + t,
                     if abs(Aa(k,j)) >= t,
                         B(ix) = 1;
                         if sign(A(k,j)) == -1,
@@ -72,7 +73,7 @@ function B = BitplaneEncoding(C1, C2, C3, maxIter)
                     ix = ix+1;
                 end
             end
-            th(k) = th(k) /2; % update threshold
+            th(k) = t /2; % update threshold
         end
     end
     B = B(1:ix-1,:);
