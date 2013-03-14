@@ -1,25 +1,23 @@
 
-function plot_sub( A_yuv, A_sub, A_up )
-%PLOT_SUB   Plots an original image and its 4:2:0 chroma subsampled
-%           version (and 2:4:0 version).
+function plot_sub(YUV, A_up)
+%PLOT_SUB       Plots an image and its 4:2:0 and 2:4:0 chroma subsampled 
+%               versions.
 
     figure,
     
-    % convert orig A in YUV to RGB and plot it
-    A_rgb = uint8(yuv2rgb(A_yuv));
-    subplot(1,3,1), imshow(A_rgb);
-    title('original image'),
+    RGB = yuv2rgb(YUV);
+    subplot(1,3,1), imshow(uint8(RGB));
+    title('Original image'),
 
-    % show A w/ subsampled U and V
-    A = uint8(yuv2rgb(A_sub));
-    subplot(1,3,2), imshow(A);
+    A_up = yuv2rgb(A_up);
+    subplot(1,3,2), imshow(uint8(A_up));
     title('4:2:0 chroma subsampling')
 
-    % show A w/ subsampled Y
-    sY = A_yuv;
-    sY(:,:,1) = A_up(:,:,1);
-    sY = uint8(yuv2rgb(sY));
-    subplot(1,3,3), imshow(sY);
+    Y = YUV(1:2:end,1:2:end,1); % subsample
+    Y = kron(Y, ones(2,2));     % upsample
+    YUV(:,:,1) = Y;             % merge
+    A_rgb = yuv2rgb(YUV);       % color transform
+    subplot(1,3,3), imshow(uint8(A_rgb));
     title('2:4:0 chroma subsampling')
 
 end
