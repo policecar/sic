@@ -33,6 +33,7 @@ function main(fname)
     A_rgb = double(A);                  % convert uint8 to double
     A_yuv = rgb2yuv(A_rgb);             % RGB to YUV transformation   
     [Y, U, V] = subsampling420(A_yuv);  % chroma subsampling 4:2:0
+    A_up = upsampling420(Y,U,V);
     
     % discrete wavelet tranformation
     display('wavelet transformation')
@@ -63,25 +64,29 @@ function main(fname)
     % postprocessing
     display('postprocessing')
     Y = A_bp(:,:,1);
-    A_up = upsampling420(Y, U, V);      % chroma upsample 4:2:0
-    A_res = yuv2rgb(A_up);              % convert YUV to RGB color space
+    A_res = upsampling420(Y, U, V);     % chroma upsample 4:2:0
+    A_res = yuv2rgb(A_res);             % convert YUV to RGB color space
     
     
     % make some plots and save them to disc
     plot_yuv(A_rgb, A_yuv);
     saveas(gcf, strcat(OUTPUT_DIR, fn, '_yuv'), 'png')
     
-    %plot_sub(A_yuv, A_sub, A_up)
-    %saveas(gcf, strcat(OUTPUT_DIR, fn, '_sub'), 'png')
+    plot_sub(A_yuv, A_up);
+    saveas(gcf, strcat(OUTPUT_DIR, fn, '_sub'), 'png')
     
-    plot_bitplanes(Planes)
+    plot_bitplanes(A_yuv, Planes);
     saveas(gcf, strcat(OUTPUT_DIR, fn, '_bitplanes'), 'png')
     %
     %plot_psnr(peak, threshold, cut)
     %saveas(gcf, strcat(OUTPUT_DIR, fn, '_psnr'), 'png')
     
     plot_wavelets(A_yuv(:,:,1), Y_wv, Y_dwt);
-    saveas(gcf, strcat(OUTPUT_DIR, fn, '_wavelets'), 'png')    
+    saveas(gcf, strcat(OUTPUT_DIR, fn, '_wavelets'), 'png')
+    
+    figure,
+    subplot(1,2,1), imshow(uint8(A_rgb)), title('The original'),
+    subplot(1,2,2), imshow(uint8(A_res)), title('The End')
         
     %stats = profile('info');
     %profile off
