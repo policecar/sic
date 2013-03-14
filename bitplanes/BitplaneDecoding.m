@@ -1,5 +1,5 @@
 
-function A = BitplaneDecoding(B)
+function [A, Planes] = BitplaneDecoding(B)
 %BITPLANEDECODER    Decodes a given bit stream B in Bit Plane Coding to a 
 %                   3-dimensional matrix and returns that matrix.
 
@@ -26,6 +26,8 @@ function A = BitplaneDecoding(B)
     n = w(1) * h(1);        % assuming all channels share dimensionality
     A = zeros(d, w(1), h(1));
     L_up = zeros(size(A));  % a look-up matrix which stores significance
+    pl = log2(max(th(:)));
+    Planes = zeros(d,pl,w(1),h(1));
 
     b = 1;
     while b <= (numel(B) - 3*n) % for every bit in the stream
@@ -57,7 +59,9 @@ function A = BitplaneDecoding(B)
                 end
             end
             th(k) = th(k) /2; % adjust channel-specific threshold
+            Planes(k,pl,:,:) = A(k,:,:);
         end
+        pl = pl-1;
     end
     
     % take care of sign, i.e. make originally negative numbers negative
