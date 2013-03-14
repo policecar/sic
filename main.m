@@ -3,8 +3,8 @@ function main(fname)
 
     % set default filename
     if (nargin < 1)
-        %filename = 'baboon.tiff';
-        filename = 'lena.tiff';
+        filename = 'baboon.tiff';
+        %filename = 'lena.tiff';
         %filename = 'clock.tiff';
         %filename = 'fault.jpg';
     else
@@ -57,7 +57,7 @@ function main(fname)
     %    A_dwt(:,:,3),numIter);
     toc
     pause                               % pause for bitstream manipulation
-    tic, A_bp = BitplaneDecoding(Bs); toc
+    tic, [A_bp, Planes] = BitplaneDecoding(Bs); toc
     %tic, A_bp = BitplaneZerotreeDecoding(Bs); toc
     
     % postprocessing
@@ -67,11 +67,6 @@ function main(fname)
     A_res = yuv2rgb(A_up);              % convert YUV to RGB color space
     
     
-    % analysis
-    % eg. psnr for different numbers of iteration in bitplane coding
-    % mittlere energiekonzentration
-
-    
     % make some plots and save them to disc
     %plot_yuv(A_yuv);        % plot each YUV channel separately
     %saveas(gcf, strcat(OUTPUT_DIR, fn, '_yuv'), 'png')
@@ -79,20 +74,14 @@ function main(fname)
     %plot_sub(A_yuv, A_sub, A_up)
     %saveas(gcf, strcat(OUTPUT_DIR, fn, '_sub'), 'png')
     %
-    %plot_bitplanes(A, A_bp)
-    %saveas(gcf, strcat(OUTPUT_DIR, fn, '_bitplanes'), 'png')
+    plot_bitplanes(Planes)
+    saveas(gcf, strcat(OUTPUT_DIR, fn, '_bitplanes'), 'png')
+    %
     %plot_psnr(peak, threshold, cut)
     %saveas(gcf, strcat(OUTPUT_DIR, fn, '_psnr'), 'png')
     %
-    %plot_day5(A, A_yuv, A_bp),
-    %saveas(gcf, strcat(OUTPUT_DIR, fn, '_day5'), 'png')
-    %
-    plot_day6(A_yuv, A_wv, A_dwt),
-    saveas(gcf, strcat(OUTPUT_DIR, fn, '_day6'), 'png')
-    %
-    plot_final(A_rgb, A_res);
-%     saveas(gcf, strcat(OUTPUT_DIR, fn, '_day9'), 'png')
-    
+    plot_wavelets(A_yuv(:,:,1), Y_wv, Y_dwt);
+    saveas(gcf, strcat(OUTPUT_DIR, fn, '_wavelets'), 'png')    
         
     %stats = profile('info');
     %profile off
