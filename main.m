@@ -27,18 +27,16 @@ function main(fname)
     % open image
     A = imread(strcat(DATA_DIR, filename));
     
-        
     % process image
     % preprocessing
     display('preprocessing')
     A_rgb = double(A);                  % convert uint8 to double
-    [m,n,d] = size(A);
     A_yuv = rgb2yuv(A_rgb);             % RGB to YUV transformation   
     [Y, U, V] = subsampling420(A_yuv);  % chroma subsampling 4:2:0
     
     % discrete wavelet tranformation
-    display('discrete wavelet transformation')
-    wavelet = 0;                        % choose b/w Haar and Daubechies
+    display('wavelet transformation')
+    wavelet = 1;                        % choose b/w Haar and Daubechies
     Y_wv = DWTEncoder(Y, wavelet);
     Y_dwt = DWTDecoder(Y_wv, wavelet);
     U_wv = DWTEncoder(U, wavelet);
@@ -46,7 +44,7 @@ function main(fname)
     V_wv = DWTEncoder(V, wavelet);
     V_dwt = DWTDecoder(V_wv, wavelet);
     
-    % temporary hack: upsample U_dwt and V_dwt
+    % temporary hack until bit plane coding works w/ diff. sizes
     A_wv = upsampling420(Y_wv,U_wv,V_wv);
     A_dwt = upsampling420(Y_dwt, U_dwt, V_dwt);
     
