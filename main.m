@@ -68,18 +68,18 @@ function main(fname)
     
     
     % make some plots and save them to disc
-    %plot_yuv(A_yuv);        % plot each YUV channel separately
-    %saveas(gcf, strcat(OUTPUT_DIR, fn, '_yuv'), 'png')
-    %
+    plot_yuv(A_rgb, A_yuv);
+    saveas(gcf, strcat(OUTPUT_DIR, fn, '_yuv'), 'png')
+    
     %plot_sub(A_yuv, A_sub, A_up)
     %saveas(gcf, strcat(OUTPUT_DIR, fn, '_sub'), 'png')
-    %
+    
     plot_bitplanes(Planes)
     saveas(gcf, strcat(OUTPUT_DIR, fn, '_bitplanes'), 'png')
     %
     %plot_psnr(peak, threshold, cut)
     %saveas(gcf, strcat(OUTPUT_DIR, fn, '_psnr'), 'png')
-    %
+    
     plot_wavelets(A_yuv(:,:,1), Y_wv, Y_dwt);
     saveas(gcf, strcat(OUTPUT_DIR, fn, '_wavelets'), 'png')    
         
