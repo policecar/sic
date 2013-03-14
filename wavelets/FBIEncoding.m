@@ -29,7 +29,7 @@ function T = FBIEncoding(X)
         HH = HH(1:2:end,1:2:end)';
         
         T(1:n,1:n) = [LL,LH;HL,HH];
-                
+        
         % update
         n = n /2;
         X = T(1:n,1:n);
