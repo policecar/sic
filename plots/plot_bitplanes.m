@@ -1,16 +1,17 @@
 
-function plot_bitplanes(A, A_bp)
-%PLOT_BITPLANE      Plots an image given as 3-D matrix and its bit plane 
-%                   coded version.
+function plot_bitplanes(BP)
+%PLOT_BITPLANES     Given the bit planes of an images as 4-D matrix, plot
+%                   them in succession.
 
     figure,
+    title('Bit plane coding'),
 
-    A = uint8(A);
-    subplot(1,2,1), imshow(A);
-    title('original image'),
-
-    A_bp = uint8(A_bp);
-    subplot(1,2,2), imshow(A_bp);
-    title('bit plane transform'),
+    % helper variables
+    k = 1;              % plot only the Y channel
+    j = size(BP,2);     % number of bit planes
+    
+    for i = 1:j;
+        subplot(2,j/2,i), imshow(uint8(squeeze(BP(k,j-i+1,:,:))));
+    end
 
 end
