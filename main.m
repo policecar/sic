@@ -55,12 +55,12 @@ function main(fname)
     numIter = 7;
     tic,
     Bs = BitplaneEncoding(A_dwt(:,:,1),A_dwt(:,:,2),A_dwt(:,:,3), numIter);
-%     Bs = BitplaneZerotreeEncoding(A_dwt(:,:,1), A_dwt(:,:,2), ...
-%                                     A_dwt(:,:,3),numIter);
+    %Bs = BitplaneZerotreeEncoding(A_dwt(:,:,1), A_dwt(:,:,2), ...
+    %                                A_dwt(:,:,3),numIter);
     toc
     %pause                              % pause for bitstream manipulation
     tic, [A_bp, Planes] = BitplaneDecoding(Bs); toc
-%     tic, A_bp = BitplaneZerotreeDecoding(Bs); toc
+    %tic, A_bp = BitplaneZerotreeDecoding(Bs); toc
     
     % postprocessing
     display('postprocessing')
@@ -78,9 +78,6 @@ function main(fname)
     
     plot_bitplanes(A_yuv, Planes);
     saveas(gcf, strcat(OUTPUT_DIR, fn, '_bitplanes'), 'png')
-    %
-    %plot_psnr(peak, threshold, cut)
-    %saveas(gcf, strcat(OUTPUT_DIR, fn, '_psnr'), 'png')
     
     plot_wavelets(A_yuv(:,:,1), Y_wv, Y_dwt);
     saveas(gcf, strcat(OUTPUT_DIR, fn, '_wavelets'), 'png')
