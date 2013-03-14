@@ -3,8 +3,8 @@ function main(fname)
 
     % set default filename
     if (nargin < 1)
-        filename = 'baboon.tiff';
-        %filename = 'lena.tiff';
+        %filename = 'baboon.tiff';
+        filename = 'lena.tiff';
         %filename = 'clock.tiff';
         %filename = 'fault.jpg';
     else
@@ -14,6 +14,7 @@ function main(fname)
     addpath('farbraeume');
     addpath('bitplanes');
     addpath('wavelets');
+    addpath('measures');
     addpath('plots');
 
     DATA_DIR = 'images/color/';
@@ -53,19 +54,19 @@ function main(fname)
     display('bit plane coding')
     numIter = 7;
     tic,
-    Bs = BitplaneEncoding(A_dwt(:,:,1),A_dwt(:,:,2),A_dwt(:,:,3),numIter);
-    %Bs = BitplaneZerotreeEncoding(A_dwt(:,:,1), A_dwt(:,:,2), ...
-    %    A_dwt(:,:,3),numIter);
+    Bs = BitplaneEncoding(A_dwt(:,:,1),A_dwt(:,:,2),A_dwt(:,:,3), numIter);
+%     Bs = BitplaneZerotreeEncoding(A_dwt(:,:,1), A_dwt(:,:,2), ...
+%                                     A_dwt(:,:,3),numIter);
     toc
-    pause                               % pause for bitstream manipulation
+    %pause                              % pause for bitstream manipulation
     tic, [A_bp, Planes] = BitplaneDecoding(Bs); toc
-    %tic, A_bp = BitplaneZerotreeDecoding(Bs); toc
+%     tic, A_bp = BitplaneZerotreeDecoding(Bs); toc
     
     % postprocessing
     display('postprocessing')
     Y = A_bp(:,:,1);
-    A_res = upsampling420(Y, U, V);     % chroma upsample 4:2:0
-    A_res = yuv2rgb(A_res);             % convert YUV to RGB color space
+    A_r = upsampling420(Y, U, V);       % chroma upsample 4:2:0
+    A_res = yuv2rgb(A_r);               % convert YUV to RGB color space
     
     
     % make some plots and save them to disc
@@ -83,6 +84,9 @@ function main(fname)
     
     plot_wavelets(A_yuv(:,:,1), Y_wv, Y_dwt);
     saveas(gcf, strcat(OUTPUT_DIR, fn, '_wavelets'), 'png')
+    
+    plot_RD(A_yuv)
+    saveas(gcf, strcat(OUTPUT_DIR, fn, '_rd'), 'png')
     
     figure,
     subplot(1,2,1), imshow(uint8(A_rgb)), title('The original'),
