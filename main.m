@@ -14,6 +14,7 @@ function main(fname)
     addpath('farbraeume');
     addpath('bitplanes');
     addpath('wavelets');
+    addpath('plots');
 
     DATA_DIR = 'images/color/';
     %DATA_DIR = 'images/gray/';
@@ -26,28 +27,46 @@ function main(fname)
     % open image
     A = imread(strcat(DATA_DIR, filename));
     
+        
     % process image
-    A_rgb = double(A);      % convert uint8 to double
+    % preprocessing
+    display('preprocessing')
+    A_rgb = double(A);                  % convert uint8 to double
+    [m,n,d] = size(A);
+    A_yuv = rgb2yuv(A_rgb);             % RGB to YUV transformation   
+    [Y, U, V] = subsampling420(A_yuv);  % chroma subsampling 4:2:0
     
-    % RGB to YUV transformation
-    A_yuv = rgb2yuv(A_rgb);
+    % discrete wavelet tranformation
+    display('discrete wavelet transformation')
+    wavelet = 0;                        % choose b/w Haar and Daubechies
+    Y_wv = DWTEncoder(Y, wavelet);
+    Y_dwt = DWTDecoder(Y_wv, wavelet);
+    U_wv = DWTEncoder(U, wavelet);
+    U_dwt = DWTDecoder(U_wv, wavelet);
+    V_wv = DWTEncoder(V, wavelet);
+    V_dwt = DWTDecoder(V_wv, wavelet);
     
-    % chroma subsampling 4:2:0
-    tic, [A_sub, A_up] = subsampling420(A_yuv); toc
+    % temporary hack: upsample U_dwt and V_dwt
+    A_wv = upsampling420(Y_wv,U_wv,V_wv);
+    A_dwt = upsampling420(Y_dwt, U_dwt, V_dwt);
     
-    % wavelet transformation
-    %T_haar = DWTEncoder(A_yuv(:,:,1), 0);
-    %Y_haar = DWTDecoder(T_haar, 0);    
-    T_fbi = DWTEncoder(A_yuv(:,:,1), 1);
-    Y_fbi = DWTDecoder(T_fbi, 1);
-
-    % bit plane coding
+    % bit plane coding (potentially zero-tree pimped)
+    display('bit plane coding')
     numIter = 7;
     tic,
-    Bs = BitplaneEncoding(A_yuv(:,:,1), A_yuv(:,:,2), A_yuv(:,:,3), ...
-        numIter);
+    Bs = BitplaneEncoding(A_dwt(:,:,1),A_dwt(:,:,2),A_dwt(:,:,3),numIter);
+    %Bs = BitplaneZerotreeEncoding(A_dwt(:,:,1), A_dwt(:,:,2), ...
+    %    A_dwt(:,:,3),numIter);
     toc
+    pause                               % pause for bitstream manipulation
     tic, A_bp = BitplaneDecoding(Bs); toc
+    %tic, A_bp = BitplaneZerotreeDecoding(Bs); toc
+    
+    % postprocessing
+    display('postprocessing')
+    Y = A_bp(:,:,1);
+    A_up = upsampling420(Y, U, V);      % chroma upsample 4:2:0
+    A_res = yuv2rgb(A_up);              % convert YUV to RGB color space
     
     
     % analysis
@@ -70,8 +89,12 @@ function main(fname)
     %plot_day5(A, A_yuv, A_bp),
     %saveas(gcf, strcat(OUTPUT_DIR, fn, '_day5'), 'png')
     %
-    plot_day6(A_yuv, T_fbi, Y_fbi),
-    saveas(gcf, strcat(OUTPUT_DIR, fn, '_day6'), 'png')  
+    plot_day6(A_yuv, A_wv, A_dwt),
+    saveas(gcf, strcat(OUTPUT_DIR, fn, '_day6'), 'png')
+    %
+    plot_final(A_rgb, A_res);
+%     saveas(gcf, strcat(OUTPUT_DIR, fn, '_day9'), 'png')
+    
         
     %stats = profile('info');
     %profile off
