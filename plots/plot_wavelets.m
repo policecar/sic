@@ -10,10 +10,10 @@ function plot_wavelets(YUV, Y_enc, Y_dwt)
     title('original Y channel')
 
     subplot(1,4,2), imshow(uint8(Y_enc)),
-    title('Wavelet encoded Y channel')
+    title('Wavelet encoding')
     
     subplot(1,4,3), imshow(uint8(Y_dwt)),
-    title('Wavelet transformed Y channel')
+    title('Wavelet transformation')
         
     Diff = Y - Y_dwt;
     subplot(1,4,4), imshow(uint8(Diff)),
