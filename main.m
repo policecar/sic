@@ -38,7 +38,7 @@ function main(fname)
     
     % discrete wavelet tranformation
     display('wavelet transformation')
-    wavelet = 1;                        % choose b/w Haar and Daubechies
+    wavelet = 0;                        % choose b/w Haar and Daubechies
     Y_wv = DWTEncoder(Y, wavelet);
     Y_dwt = DWTDecoder(Y_wv, wavelet);
     U_wv = DWTEncoder(U, wavelet);
@@ -82,8 +82,8 @@ function main(fname)
     plot_wavelets(A_yuv(:,:,1), Y_wv, Y_dwt);
     saveas(gcf, strcat(OUTPUT_DIR, fn, '_wavelets'), 'png')
     
-    plot_RD(A_yuv)
-    saveas(gcf, strcat(OUTPUT_DIR, fn, '_rd'), 'png')
+    %plot_RD(A_yuv)
+    %saveas(gcf, strcat(OUTPUT_DIR, fn, '_rd'), 'png')
     
     figure,
     subplot(1,2,1), imshow(uint8(A_rgb)), title('The original'),
