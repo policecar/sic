@@ -1,7 +1,7 @@
 
-function [A, Planes] = BitplaneDecoding(B)
-%BITPLANEDECODER    Decodes a given bit stream B in Bit Plane Coding to a 
-%                   3-dimensional matrix and returns that matrix.
+function [C1, C2, C3, Planes] = BitplaneDecoding(Bitstream)
+%BITPLANEDECODER    Decodes a given bit stream in Bit Plane Coding to 
+%                   a 3-dimensional matrix and returns that matrix.
 
     % bit stream symbols:
     %   00    insignificant
@@ -9,76 +9,103 @@ function [A, Planes] = BitplaneDecoding(B)
     %   10    significant and positive 
     %   11    significant and negative
     
-    % instantiate some helper variables
-    d = 3;              % number of channels
-    w = zeros(d,1);     % widthes
-    h = zeros(d,1);     % heights
+    % helper variables
+    d = 3;              % number of output channels
+    ptr = 1;
+    sz = zeros(d,2);    % sizes of channels
     th = zeros(d,1);    % thresholds
     
-    % parse bitstream info for each of the channels
-    ib = 3* 8;  % number of info bits per channel
+    % parse bitstream info header for each channel
+    ib = 3* 8;          % number of info bits per channel
     for k = 1:d
-        [w(k), h(k), th(k)] = parseBitstreamInfo(B, ib);
-        B = B(ib+1:end); % remove parsed info from stream
+        header = Bitstream(((k-1)*ib)+1:k*ib);
+        [sz(k,1), sz(k,2), th(k)] = parseHeader(header);
     end
+    ptr = ptr + 3*ib;
     
-    % instantiate more helper variables
-    n = w(1) * h(1);        % assuming all channels share dimensionality
-    A = zeros(d, w(1), h(1));
-    L_up = zeros(size(A));  % a look-up matrix which stores significance
-    pl = log2(max(th(:)));
-    Planes = zeros(d,pl,w(1),h(1));
+    % moa helper variables
+    Channel = cell(1,3);     % outgoing data
+    Channel{1} = zeros(sz(1));
+    Channel{2} = zeros(sz(2));
+    Channel{3} = zeros(sz(3));
+    Lookup = Channel;           % significance map
+    pMax = 99;          % assume a max of 99 bit planes
+    Planes = cell(3,pMax);% cell array to store different bit plane levels
+    n = sz(:,1) .* sz(:,2); % number of elements per channel
+    
+    p = pMax - 1;
+    while ptr < length(Bitstream),
+        for k = 1:d, % for every channel in turn
+            for c = 1:n(k), % for every pixel
 
-    b = 1;
-    while b <= (numel(B) - 3*n) % for every bit in the stream
-        for k = 1:d % for every channel in turn
-            for c = 1:n % for every pixel
-
+                a = Lookup{k}(c);
                 % if pixel is significant, read two significance bits
-                if L_up(k,c) == 0
-                    if B(b) == 0,
-                        % if B(b+1) ==0, L_up(k,c) = 0; end  << implicitly
-                        if B(b+1) == 1,
-                            % do nothing yet
-                        end
-                    else
-                        if B(b+1) == 0
-                            L_up(k,c) = 1;
+                if Lookup{k}(c) == 0
+                    
+                    % if significant
+                    if Bitstream(ptr) == 1,
+                        
+                        % if positive significant
+                        if Bitstream(ptr+1) == 0,
+                            Lookup{k}(c) = 1;
+                            Channel{k}(c) = th(k);
+                        
+                        % if negative significant
                         else
-                            L_up(k,c) = -1;
+                            Lookup{k}(c) = 1;
+                            Channel{k}(c) = -th(k);
                         end
-                        A(k,c) = th(k);
+                        
+                    % if insignificant    
+                    else
+                        
+                        if Bitstream(ptr+1) == 0,
+                            % do nothing
+                        else 
+                            display('do not panic')
+                        end
+                        
                     end
-                    b = b+2;
-                % elseif pixel has been significant, read a refinement bit
+                    ptr = ptr+2;
+
+                % if pixel has been significant, read a refinement bit
                 else
-                    if B(b) == 1
-                        A(k,c) = A(k,c) + th(k);
+                    
+                    if Bitstream(ptr) == 1
+                        Channel{k}(c) = Channel{k}(c) + sign(Channel{k}(c)) * th(k);
                     end
-                    b = b+1;
+                    ptr = ptr+1;
+                    
                 end
             end
             th(k) = th(k) /2; % adjust channel-specific threshold
-            Planes(k,pl,:,:) = A(k,:,:);
+            Planes{k,pMax-p} = Channel{k};
         end
-        pl = pl-1;
+        p = p-1;
     end
     
-    % take care of sign, i.e. make originally negative numbers negative
-    idx = find(L_up == -1);
-    A(idx) = -1 .* A(idx);
-    A = permute(A, [2,3,1]); % re-arrange dimensions to match [w,h,chan]
+    % cell to matrices
+    C1 = Channel{1}; C2 = Channel{2}; C3 = Channel{3};
+    % cut off at actual number of planes decoded
+    tmp = Planes;
+    Planes = cell(3,pMax-p-1);
+    for i = 1:pMax-p-1,
+        for k = 1:3,
+            Planes{k,i} = tmp{k,i};
+        end
+    end
+    clear tmp
 
 end
 
 
-function [w,h,th] = parseBitstreamInfo(bitstream, ib)
+function [w,h,th] = parseHeader(header)
 %GETBITSTREAMINFO   Returns width, height and threshold of a given 2-D
 %                   image channel from their 8-bit representations.
     
-    bpi = ib /3;
-    w  = 2^ bin2dec(num2str(bitstream(1:bpi)'));
-    h  = 2^ bin2dec(num2str(bitstream(bpi+1:2*bpi)'));
-    th = 2^ bin2dec(num2str(bitstream(2*bpi+1:3*bpi)'));
+    i = 8;
+    w  = 2^ bin2dec(num2str(header(1:i)'));
+    h  = 2^ bin2dec(num2str(header(i+1:2*i)'));
+    th = 2^ bin2dec(num2str(header(2*i+1:3*i)'));
     
 end

@@ -1,93 +1,105 @@
 
-function B = BitplaneEncoding(C1, C2, C3, maxIter)
-%BITPLANEENCODER    Given 3 separate channels of an image and the number of 
-%                   bit planes to code, performs bit plane encoding and
-%                   produces an (intertwined) bitstream.
+function Bitstream = BitplaneEncoding(C1, C2, C3, maxIter)
+%BITPLANEENCODER    Given three separate 2-D channels of an image (with 
+%                   potentially different dimensions) and the number of 
+%                   bit planes to encode, performs bit plane encoding 
+%                   and produces an (intertwined) bitstream.
 
     % bit stream symbols:
     %   00    insignificant
     %   01    zero tree (unused as yet)
     %   10    significant and positive 
     %   11    significant and negative
-    
-    % (note: function signature is heteronomous)
-    % merge channels into single matrix 
-    A(1,:,:) = C1; A(2,:,:) = C2; A(3,:,:) = C3;
-    [d, m, n] = size(A);
-    th = zeros(d,1);
-    
+        
+    % helper variables
+    d = 3;              % number of input channels
+    threshold = zeros(1,3);    % set thresholdresholds
+    threshold(1) = 2^(floor(log2(max(abs(C1(:))))));
+    threshold(2) = 2^(floor(log2(max(abs(C2(:))))));
+    threshold(3) = 2^(floor(log2(max(abs(C3(:))))));
+    N = [numel(C1), numel(C2), numel(C3)];
+    Channel = cell(1,3);     % incoming data
+    Channel{1} = C1; Channel{2} = C2; Channel{3} = C3;
+    Remainder = Channel;     % helper copy for shaved values 
+
     % instantiate bitstream (to max required, cut off later on)
-    ib = 3* 8;  % number of info bits per channel
-    B = zeros(ib *d + numel(A) *2 *maxIter, 1);  % length of info + data
-    ix = 1;     % current index in bitstream
+    ib = 3* 8;          % number of info bits per channel
+    Bitstream = zeros(ib *d + sum(N) *2 *maxIter, 1);
+    ptr = 1;             % current index in bitstream
     
     % write info to bitstream
     for k = 1:d
-        th(k) = 2^(floor(log2(max(abs(A(k,:)))))); % set threshold
         ie = k * ib;
-        B(ix:ie) = getBitstreamInfo(A(k,:,:), th(k))';
-        ix = ix + ib;
+        Bitstream(ptr:ie) = getBitstreamInfo(size(Channel{k}), ...
+            threshold(k))';
+        ptr = ptr + ib; %rename to ptr
     end
-    
-    Aa = A;         % a helper matrix to store shaved entry values
-    idx = 1:m*n;    % order of matrix traversal, by column for now
     
     for it = 1:maxIter % for every threshold
         for k = 1:d % for each of the channels in turn
             
-            t = th(k);
-            for i = 1:numel(idx) % for every pixel
+            t = threshold(k);
+
+            for j = 1:N(k) % for every pixel
 
                 % write data to bit stream
 
-                j = idx(i); % retrieve actual index
-
-                % if pixel is significant, send two significance bits
-                if A(k,j) == Aa(k,j), % if pixel has not been significant
-                    if abs(A(k,j)) >= t, % if pixel is significant now
-                        B(ix) = 1;
-                        if sign(A(k,j)) == -1, % if value is sub-zero
-                            B(ix+1) = 1;
-                            Aa(k,j) = Aa(k,j) + t;
-                        else
-                            B(ix+1) = 0;
-                            Aa(k,j) = Aa(k,j) - t;
-                        end
+                % if pixel hasn't been significant, send two significance
+                % bits
+                if Channel{k}(j) == Remainder{k}(j),
+                    
+                    % if positive significant
+                    if Channel{k}(j) >= t,
+                        Bitstream(ptr)   = 1;
+                        Bitstream(ptr+1) = 0;
+                        Remainder{k}(j) = Remainder{k}(j) - t;
+                    
+                    % if negative significance
+                    elseif Channel{k}(j) <= -t,
+                        Bitstream(ptr)   = 1;
+                        Bitstream(ptr+1) = 1;
+                        Remainder{k}(j) = Remainder{k}(j) + t;
+                    
+                    % if insignificant
                     else
-                        B(ix) = 0;
-                        B(ix+1) = 0;
+                        Bitstream(ptr)   = 0;
+                        Bitstream(ptr+1) = 0;                        
                     end
-                    ix = ix+2;
-                % else send a single refinement bit
-                elseif abs(A(k,j)) > abs(Aa(k,j)) + t,
-                    if abs(Aa(k,j)) >= t,
-                        B(ix) = 1;
-                        if sign(A(k,j)) == -1,
-                            Aa(k,j) = Aa(k,j) + t;
-                        else
-                            Aa(k,j) = Aa(k,j) - t;
-                        end
+                    ptr = ptr + 2;
+                    
+                % if pixel has been significant (but not in this round), 
+                % send one refinement bit
+                else
+                    
+                    if Remainder{k}(j) >= t,
+                        Bitstream(ptr) = 1;
+                        Remainder{k}(j) = Remainder{k}(j) - t;
+                
+                    elseif Remainder{k}(j) <= -t,
+                        Bitstream(ptr) = 1;
+                        Remainder{k}(j) = Remainder{k}(j) + t;
+                    
                     else
-                        B(ix) = 0;
+                        Bitstream(ptr) = 0;
                     end
-                    ix = ix+1;
+                    ptr = ptr + 1;
                 end
+                
             end
-            th(k) = t /2; % update threshold
+            threshold(k) = threshold(k) /2; % update threshold
         end
     end
-    B = B(1:ix-1,:);
+    Bitstream = Bitstream(1:ptr-1,:);
 end
 
 
-function info = getBitstreamInfo(Chan, th)
+function info = getBitstreamInfo(szChan, threshold)
 %GETBITSTREAMINFO   Returns 8-bit representations of width, height and 
 %                   threshold of a given 2-D image channel.
     
-    [~, m, n] = size(Chan);
-    w = dec2bin(log2(m),8) - '0';
-    h = dec2bin(log2(n),8) - '0';
-    th = dec2bin(log2(th),8) - '0';
-    info = [w, h, th];
+    width = dec2bin(log2(szChan(1)),8) - '0';
+    height = dec2bin(log2(szChan(2)),8) - '0';
+    threshold = dec2bin(log2(threshold),8) - '0';
+    info = [width, height, threshold];
 
 end
