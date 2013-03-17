@@ -1,30 +1,30 @@
 
-function h = sconv(f,g)
-%SCONV      Symmetric convolution of f and g where f is a row vector and g
-%           is a matrix.
-
-    % some helper variables
-    len = numel(f);
-    ext = floor(len /2);
+function H = sconv(Filter, Matrix)
+%SCONV      Row-wise symmetric convolution of a filter given as row vector 
+%           with a matrix.
     
-    % if filter f exceeds size of matrix g, cut it on both ends
-    % 
-    if ext >= size(g,2),
-        k = size(g,2) - 1;  % size of mirror-able part
-        ctr = ceil(len /2); % the filter's center (assuming odd-length)
-        f = f(1,ctr-k:ctr+k);
-        ext = k;
-    end
+    % helper variables
+    n = length(Matrix); % length of input matrix
+    f = length(Filter); % length of filter
+    l = f + n - 1;      % length of symmetrically extended matrix
+    fhalbe = (f-1)/2;	% length of half the filter (ceiled)
+    z = 2 * n - 2;		% length of circular index
     
-    % symmetrically extend g by half the length of f
-    lext = fliplr(g(:,2:ext+1));
-    rext = fliplr(g(:,end-ext:end-1));
-    g = [lext, g, rext];
+    % symmetric extension
+    E = zeros(n,l);
+	for col = 1:length(E),
 
-    % symmetrically convolute g with f
-    h = conv2(f,g);
+		i =  mod((col - 1) - fhalbe, z) + 1; % get z index of pixel value 
+											 % to copy
+        j = n - abs(i - n);		% map index to actual index in Matrix
+        E(:,col) = Matrix(:,j);	% copy respective column to extended matrix
 
-    % remove symmetric extensions as well as matlab 0 cushioning
-    h = h(:,1+2*ext:end-2*ext);
-
+	end
+	
+    % convolute
+    H = conv2(Filter, E);
+    
+    % trim matrix
+    H = H(:,2*fhalbe+1:2*fhalbe+n);
+    
 end
