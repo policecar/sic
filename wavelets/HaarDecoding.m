@@ -23,7 +23,7 @@ function T = HaarDecoding(T)
         end
         
         % filter
-        T(1:n,1:n) = H * T(1:n,1:n) * H';
+        T(1:n,1:n) = H * T(1:n,1:n) * H'; % note that here: H' = H^-1
         
         % update
         n = n *2;
