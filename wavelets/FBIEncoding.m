@@ -1,20 +1,15 @@
 
-function T = FBIEncoding(X)
+function X = FBIEncoding(X, a, d)
 %FBIENCODING    Discrete Wavelet Transformation of a 2-D image (encoding).
 %               using the Daubechies wavelet.
 
-    % fetch filters
-    [a, d, ~, ~] = DaubechiesWavelet();
-    
-    T = zeros(size(X));
-    
-    % iteratively until size(X) = [2,2], do
-    [~, n] = size(X);
-    while n >= 2
+    % recursively compute wavelet coefficients
+    n = length(X);
+    if n >= 2
     
         % symmetrically convolute X with analysis filters a and d
-        LP = sconv(a, X); % low pass
-        HP = sconv(d, X); % high pass
+        LP = sconv(a, X(1:n,1:n)); % low pass
+        HP = sconv(d, X(1:n,1:n)); % high pass
         
         % transpose, convolute again, transpose again
         LL = sconv(a, LP')';
@@ -28,10 +23,7 @@ function T = FBIEncoding(X)
         LH = LH(1:2:end,2:2:end);
         HH = HH(2:2:end,2:2:end);
 
-        T(1:n,1:n) = [LL,HL;LH,HH];
+        X(1:n,1:n) = [FBIEncoding(LL, a, d), HL; LH, HH];
         
-        % update
-        n = n /2;
-        X = T(1:n,1:n);
     end
 end

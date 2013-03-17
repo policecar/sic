@@ -1,10 +1,7 @@
 
-function T = FBIDecoding(T)
+function T = FBIDecoding(T, as, ds)
 %FBIDECODING    Discrete Wavelet Transformation of a 2-D image (decoding)
 %               using Daubechies wavelets.
-
-    % fetch filters
-    [~, ~, as, ds] = DaubechiesWavelet();
 
     % write 0 in every 2nd from 2 for LP, every 2nd from 1 for HP
     
@@ -13,39 +10,38 @@ function T = FBIDecoding(T)
     lil_HL = [0,0;1,0];
     lil_LH = [0,1;0,0];
     lil_HH = [0,0;0,1];
-        
-    % iteratively until n = size(T,1), do
-    n = 2;
-    while n <= size(T,1)
+    
+    n = length(T);
+    if n >= 2,
         
         % split T(1:n,1:n) into four quadrants
         m = n/2;
-        LL0 = T(1:m,1:m);
-        HL0 = T(1:m,m+1:n);
-        LH0 = T(m+1:n,1:m);
-        HH0 = T(m+1:n,m+1:n);
+        Q1 = FBIDecoding(T(1:m,1:m), as, ds);
+        Q2 = T(1:m,m+1:n);
+        Q3 = T(m+1:n,1:m);
+        Q4 = T(m+1:n,m+1:n);
         
         % upsample
-        LL1 = kron(LL0, lil_LL);
-        HL1 = kron(HL0, lil_HL);
-        LH1 = kron(LH0, lil_LH);
-        HH1 = kron(HH0, lil_HH);
-        
+        U1 = kron(Q1, lil_LL);
+        U2 = kron(Q2, lil_HL);
+        U3 = kron(Q3, lil_LH);
+        U4 = kron(Q4, lil_HH);
+
         % transpose and convolute
-        LL2 = sconv(as, LL1');  % low pass
-        HL2 = sconv(as, HL1');  % high pass
-        LH2 = sconv(ds, LH1');
-        HH2 = sconv(ds, HH1');
+        L1 = sconv(as, U1');  % low pass
+        L2 = sconv(as, U2');  % high pass
+        H1 = sconv(ds, U3');
+        H2 = sconv(ds, U4');
                         
         % transpose and convolute again
-        LL = sconv(as, LL2');
-        HL = sconv(ds, HL2');
-        LH = sconv(as, LH2');
-        HH = sconv(ds, HH2');
+        LL = sconv(as, L1');
+        HL = sconv(ds, L2');
+        LH = sconv(as, H1');
+        HH = sconv(ds, H2');
         
-        T(1:n,1:n) = (LL + HL + LH + HH);
-        n = n *2;
+        T = (LL + HL + LH + HH);
                 
     end
+%     T = 0.5 * T;
     
 end
