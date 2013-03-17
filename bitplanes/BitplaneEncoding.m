@@ -24,7 +24,7 @@ function Bitstream = BitplaneEncoding(C1, C2, C3, maxIter)
 
     % instantiate bitstream (to max required, cut off later on)
     ib = 3* 8;          % number of info bits per channel
-    Bitstream = zeros(ib *d + sum(N) *2 *maxIter, 1);
+    Bitstream = zeros(ib *d + sum(N) *2 *maxIter, 1, 'uint8');
     ptr = 1;             % current index in bitstream
     
     % write info to bitstream
