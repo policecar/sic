@@ -1,5 +1,5 @@
 
-function [C1, C2, C3, Planes] = BitplaneDecoding(Bitstream)
+function [C1, C2, C3] = BitplaneDecoding(Bitstream)
 %BITPLANEDECODER    Decodes a given bit stream in Bit Plane Coding to 
 %                   a 3-dimensional matrix and returns that matrix.
 
@@ -28,9 +28,8 @@ function [C1, C2, C3, Planes] = BitplaneDecoding(Bitstream)
     Channel{1} = zeros(sz(1));
     Channel{2} = zeros(sz(2));
     Channel{3} = zeros(sz(3));
-    Lookup = Channel;           % significance map
-    pMax = 99;          % assume a max of 99 bit planes
-    Planes = cell(3,pMax);% cell array to store different bit plane levels
+    Lookup = Channel;       % significance map
+    pMax = 99;              % assume a max of 99 bit planes
     n = sz(:,1) .* sz(:,2); % number of elements per channel
     
     p = pMax - 1;
@@ -38,7 +37,6 @@ function [C1, C2, C3, Planes] = BitplaneDecoding(Bitstream)
         for k = 1:d, % for every channel in turn
             for c = 1:n(k), % for every pixel
 
-                a = Lookup{k}(c);
                 % if pixel is significant, read two significance bits
                 if Lookup{k}(c) == 0
                     
@@ -79,22 +77,11 @@ function [C1, C2, C3, Planes] = BitplaneDecoding(Bitstream)
                 end
             end
             th(k) = th(k) /2; % adjust channel-specific threshold
-            Planes{k,pMax-p} = Channel{k};
         end
-        p = p-1;
     end
     
     % cell to matrices
     C1 = Channel{1}; C2 = Channel{2}; C3 = Channel{3};
-    % cut off at actual number of planes decoded
-    tmp = Planes;
-    Planes = cell(3,pMax-p-1);
-    for i = 1:pMax-p-1,
-        for k = 1:3,
-            Planes{k,i} = tmp{k,i};
-        end
-    end
-    clear tmp
 
 end
 
