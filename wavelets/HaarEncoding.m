@@ -7,11 +7,12 @@ function T = HaarEncoding(X)
     v = 1/sqrt(2);
     lp = [v;  v];   % Haar scaling function < low pass filter
     hp = [v; -v];   % Haar wavelet function < high pass filter
-    
+
+    % helper variables
+    [~, n] = size(X);
     T = zeros(size(X));
 
     % iteratively until size(X) = [2,2], do
-    [~, n] = size(X);
     while n >= 2
        
         % construct resp. Haar transform
@@ -26,7 +27,6 @@ function T = HaarEncoding(X)
         
         % filter
         T(1:n,1:n) = H' * X * H;
-        % consider scaling here, subtract min, scale max-min to 0-255
 
         % update
         n = n /2;
