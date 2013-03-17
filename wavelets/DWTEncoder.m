@@ -7,6 +7,8 @@ function T = DWTEncoder(X, type)
         case 0
             T = HaarEncoding(X);
         case 1
-            T = FBIEncoding(X);
+            % fetch filters
+            [a, d, ~, ~] = DaubechiesWavelet();
+            T = FBIEncoding(X, a, d);
     end
 end

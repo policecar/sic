@@ -7,6 +7,8 @@ function Y = DWTDecoder(T, type)
         case 0
             Y = HaarDecoding(T);
         case 1
-            Y = FBIDecoding(T);
+            % fetch filters
+            [~, ~, as, ds] = DaubechiesWavelet();
+            Y = FBIDecoding(T, as, ds);
     end
 end
