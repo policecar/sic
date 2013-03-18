@@ -9,6 +9,6 @@ function Y = DWTDecoder(T, type)
         case 1
             % fetch filters
             [~, ~, as, ds] = DaubechiesWavelet();
-            Y = FBIDecoding(T, as, ds);
+            Y = DaubechiesDecoding(T, as, ds);
     end
 end
