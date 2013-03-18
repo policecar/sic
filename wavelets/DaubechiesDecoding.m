@@ -3,8 +3,6 @@ function T = DaubechiesDecoding(T, as, ds)
 %FBIDECODING    Discrete Wavelet Transformation of a 2-D image (decoding)
 %               using Daubechies wavelets.
 	
-	% write 0 in every 2nd from 2 for LP, every 2nd from 1 for HP
-	
 	% upsamplers
 	lil_LL = [1,0;0,0];
 	lil_HL = [0,0;1,0];
@@ -23,16 +21,10 @@ function T = DaubechiesDecoding(T, as, ds)
 		Q4 = T(m+1:n,m+1:n);
 
 		% upsample
-		U1 = kron(Q1, lil_LL); % lil_LL
-		U2 = kron(Q2, lil_HH); % lil_HL
-		U3 = kron(Q3, lil_LL); % lil_LH
-		U4 = kron(Q4, lil_HH); % lil_HH
-
-		% % best so far
-		% U1 = kron(Q1, lil_LL); % lil_LL
-		% U2 = kron(Q2, lil_HH); % lil_HL
-		% U3 = kron(Q3, lil_LL); % lil_LH
-		% U4 = kron(Q4, lil_HH); % lil_HH
+		U1 = kron(Q1, lil_LL);
+		U2 = kron(Q2, lil_HH);
+		U3 = kron(Q3, lil_LL);
+		U4 = kron(Q4, lil_HH);
 
 		% transpose, convolute, transpose again
 		L1 = sconv(as, U1')'; % low pass

@@ -18,21 +18,10 @@ function X = DaubechiesEncoding(X, a, d)
 		HH = sconv(d, HP')';
 
 		% subsample
-		% LL = LL(1:2:end,1:2:end);
-		% HL = HL(2:2:end,1:2:end);
-		% LH = LH(1:2:end,2:2:end);
-		% HH = HH(2:2:end,2:2:end);
-
 		LL = LL(1:2:end,1:2:end);
 		HL = HL(2:2:end,2:2:end);
 		LH = LH(1:2:end,1:2:end);
 		HH = HH(2:2:end,2:2:end);
-
-		% % best so far
-		% LL = LL(1:2:end,1:2:end);
-		% HL = HL(2:2:end,2:2:end);
-		% LH = LH(1:2:end,1:2:end);
-		% HH = HH(2:2:end,2:2:end);
 
 		% recursively
 		% X(1:n,1:n) = [DaubechiesEncoding(LL, a, d), HL; LH, HH];
