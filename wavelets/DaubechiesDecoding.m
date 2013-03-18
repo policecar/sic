@@ -1,7 +1,7 @@
 
 function T = DaubechiesDecoding(T, as, ds)
-%FBIDECODING    Discrete Wavelet Transformation of a 2-D image (decoding)
-%               using Daubechies wavelets.
+%DAUBECHIESDECODING		Discrete Wavelet Transformation, decoding part, 
+%						of a 2-D image using Daubechies wavelets.
 	
 	% upsamplers
 	lil_LL = [1,0;0,0];
@@ -27,8 +27,8 @@ function T = DaubechiesDecoding(T, as, ds)
 		U4 = kron(Q4, lil_HH);
 
 		% transpose, convolute, transpose again
-		L1 = sconv(as, U1')'; % low pass
-		L2 = sconv(as, U2')'; % high pass
+		L1 = sconv(as, U1')';	% low pass
+		L2 = sconv(as, U2')';	% high pass
 		H1 = sconv(ds, U3')';
 		H2 = sconv(ds, U4')';
 

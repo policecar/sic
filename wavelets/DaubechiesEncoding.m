@@ -1,7 +1,7 @@
 
 function X = DaubechiesEncoding(X, a, d)
-%FBIENCODING    Discrete Wavelet Transformation of a 2-D image (encoding).
-%               using the Daubechies wavelet.
+%DAUBECHIESENCODING		Discrete Wavelet Transformation, encoding part, 
+%						of a 2-D image using the Daubechies wavelet.
 
 	n = length(X);
 	%if n >= 2,		% recursively
