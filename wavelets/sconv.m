@@ -7,7 +7,7 @@ function H = sconv(Filter, Matrix)
     n = length(Matrix);		% length of input matrix
     f = length(Filter);		% length of filter
     l = f + n - 1;			% length of symmetrically extended matrix
-    hf = (f - 1) / 2;	% length of half the filter (ceiled)
+    hf = (f - 1) / 2;		% length of half the filter (ceiled)
     z = 2 * n - 2;			% length of circular index, e.g. cbabcd
     
     % symmetric extension
