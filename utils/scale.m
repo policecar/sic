@@ -1,9 +1,8 @@
-
-function Y = scale(X, minX, maxX)
-%SCALE  Scales input data X to scale [min; max].
+function Y = scale(X, minimum, maximum)
+%SCALE  Scales an input vector or matrix X to [minimum; maximum].
 
     Y = X - min(X(:));
-    Y = (Y / range(Y(:))) * (maxX - minX);
-    Y = Y + minX;
+    Y = (Y / range(Y(:))) * (maximum - minimum);
+    Y = Y + minimum;
 
 end
