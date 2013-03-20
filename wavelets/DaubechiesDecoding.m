@@ -15,22 +15,17 @@ function T = DaubechiesDecoding(T, as, ds)
 		Q4 = T(m+1:n,m+1:n);
 
 		% upsample
-		U1 = kron(Q1, [1;0]);
-		U2 = kron(Q2, [1;0]);
-		U3 = kron(Q3, [0;1]);
-		U4 = kron(Q4, [0;1]);
-		
+		% ie. fill up detail columns for LP and coefficient columns for HP
+		U1 = kron(Q1, [1,0;0,0]);
+		U2 = kron(Q2, [0,1;0,0]);
+		U3 = kron(Q3, [0,0;1,0]);
+		U4 = kron(Q4, [0,0;0,1]);
+
 		% transpose, convolute, transpose
 		L1 = sconv(as, U1')';	% low pass
 		L2 = sconv(as, U2')';	% high pass
 		H1 = sconv(ds, U3')';
 		H2 = sconv(ds, U4')';
-
-		% upsample
-		L1 = kron(L1, [1,0]);
-		L2 = kron(L2, [0,1]);
-		H1 = kron(H1, [1,0]);
-		H2 = kron(H2, [0,1]);
 
 		% convolute
 		LL = sconv(as, L1);
