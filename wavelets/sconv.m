@@ -4,18 +4,18 @@ function H = sconv(Filter, Matrix)
     
 	% helper variables
 	[m,n] = size(Matrix);	% length of input matrix
-	f = length(Filter);		% length of filter
-	l = f + n - 1;			% length of symmetrically extended matrix
-	hf = (f - 1) / 2;		% length of half the filter (floored)
-	z = 2 * n - 2;			% length of circular index, e.g. cbabcd
+	f = length(Filter);	% length of filter
+	l = f + n - 1;		% length of symmetrically extended matrix
+	hf = (f - 1) / 2;	% length of half the filter (floored)
+	z = 2 * n - 2;		% length of circular index, e.g. cbabcd
 
 	% symmetric extension
-	E = zeros(m,l);			% extended matrix
+	E = zeros(m,l);		% extended matrix
 	for col = 1:length(E),
 
 		i = mod((col - 1) - hf, z) + 1; % get z index of pixel to copy
 		j = n - abs(i - n);		% map z index to index in Matrix
-		E(:,col) = Matrix(:,j);	% copy respective M column to E matrix
+		E(:,col) = Matrix(:,j);		% copy respective M column to E matrix
 
 	end
 
