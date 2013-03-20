@@ -1,7 +1,8 @@
 
 function plot_wavelets(Y)
-%PLOT_WAVELETS  Plots the original Y channel, its wavelet encoding and its
-%               wavelet transform (Haar or Daubechies).
+%PLOT_WAVELETS  Plots the Y channel of an image, its Haar and Daubechies 
+%				encodings and transforms plus the difference between these
+%				two encodings.
 	
 	H_enc = DWTEncoder(0, Y);
 	H_dec = DWTDecoder(0, H_enc);
