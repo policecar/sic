@@ -1,5 +1,5 @@
 
-function T = DWTEncoder(X, type)
+function T = DWTEncoder(type, X)
 %DWTENCODER     Discrete Wavelet Transform of a 2-D matrix (encoding) with
 %               Haar wavelet if type is 0, Daubechies wavelet if type is 1.
 
