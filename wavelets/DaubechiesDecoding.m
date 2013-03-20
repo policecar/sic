@@ -3,12 +3,6 @@ function T = DaubechiesDecoding(T, as, ds)
 %DAUBECHIESDECODING		Discrete Wavelet Transformation, decoding part, 
 %						of a 2-D image using Daubechies wavelets.
 	
-	% upsamplers
-	lil_LL = [1,0;0,0];
-	lil_HL = [0,0;1,0];
-	lil_LH = [0,1;0,0];
-	lil_HH = [0,0;0,1];
-	
 	% recursively decode
 	n = length(T);
  	if n >= 2,
@@ -21,18 +15,24 @@ function T = DaubechiesDecoding(T, as, ds)
 		Q4 = T(m+1:n,m+1:n);
 
 		% upsample
-		U1 = kron(Q1, lil_LL);
-		U2 = kron(Q2, lil_HH);
-		U3 = kron(Q3, lil_LL);
-		U4 = kron(Q4, lil_HH);
-
-		% transpose, convolute, transpose again
+		U1 = kron(Q1, [1;0]);
+		U2 = kron(Q2, [1;0]);
+		U3 = kron(Q3, [0;1]);
+		U4 = kron(Q4, [0;1]);
+		
+		% transpose, convolute, transpose
 		L1 = sconv(as, U1')';	% low pass
 		L2 = sconv(as, U2')';	% high pass
 		H1 = sconv(ds, U3')';
 		H2 = sconv(ds, U4')';
 
-		% convolute again
+		% upsample
+		L1 = kron(L1, [1,0]);
+		L2 = kron(L2, [0,1]);
+		H1 = kron(H1, [1,0]);
+		H2 = kron(H2, [0,1]);
+
+		% convolute
 		LL = sconv(as, L1);
 		HL = sconv(ds, L2);
 		LH = sconv(as, H1);
