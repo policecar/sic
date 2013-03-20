@@ -1,7 +1,6 @@
-
 function H = sconv(Filter, Matrix)
-%SCONV      Row-wise symmetric convolution of a filter with a matrix 
-%			(aka row-wise local weighted averaging).
+%SCONV  Row-wise symmetric convolution of a filter with a matrix 
+%	(aka row-wise local weighted averaging).
     
 	% helper variables
 	[m,n] = size(Matrix);	% length of input matrix
