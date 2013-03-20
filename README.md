@@ -1,4 +1,4 @@
-sic
+SIC
 ===
 
 A tiny toolbox for Still Image Coding as devised during some course work:
@@ -13,7 +13,7 @@ A tiny toolbox for Still Image Coding as devised during some course work:
 
 -------
 
-In MatLab run
+In the MatLab console run
 
     >> main
     
