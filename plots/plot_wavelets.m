@@ -1,23 +1,32 @@
 
-function plot_wavelets(Y, wavelet)
+function plot_wavelets(Y)
 %PLOT_WAVELETS  Plots the original Y channel, its wavelet encoding and its
 %               wavelet transform (Haar or Daubechies).
 	
+	H_enc = DWTEncoder(0, Y);
+	H_dec = DWTDecoder(0, H_enc);
+	D_enc = DWTEncoder(1, Y);
+	D_dec = DWTDecoder(1, D_enc);
+	
 	figure,
 	
-	Y_enc = DWTEncoder(Y, wavelet);
-	Y_dec = DWTDecoder(Y_enc, wavelet);
+	subplot(2,3,1), imshow(uint8(H_dec)),
+	title('Haar transform')
 	
-	subplot(2,2,1), imshow(uint8(Y)),
+	subplot(2,3,2), imshow(uint8(D_dec)),
+	title('Daubechies transform')
+	
+	subplot(2,3,3), imshow(uint8(Y)),
 	title('Original Y channel')
 	
-	subplot(2,2,2), imshow(uint8(Y_enc*10)),
-	title('Wavelet encoded Y channel')
+	subplot(2,3,4), imshow(uint8(H_enc*2)),
+	title('Haar wavelet encoding')
 	
-	subplot(2,2,3), imshow(uint8(Y_dec)),
-	title('Wavelet transformed Y channel')
+	subplot(2,3,5), imshow(uint8(D_enc*2)),
+	title('Daubechies wavelet encoding')
 	
-	subplot(2,2,4), imshow(uint8((abs(Y - Y_dec)*10))),
-	title('Diff b/w original and wavelet transform')
-	
+	Diff = scale(abs(H_enc - D_enc),0,255);
+	subplot(2,3,6), imshow(uint8(Diff*10)),
+	title('Diff b/w Haar and Daubechies encoding')
+
 end
