@@ -39,25 +39,27 @@ function Bitstream = BitplaneEncoding(C1, C2, C3, maxIter)
 		for k = 1:d % for each of the channels in turn
 
 			t = threshold(k);
+			chan = Channel{k};
+			rem = Remainder{k};
 
 			for j = 1:N(k) % for every pixel
 
 				% write data to bit stream
-
+				
 				% if pixel hasn't been significant send 2 significance bits
-				if Channel{k}(j) == Remainder{k}(j),
+				if chan(j) == rem(j),
 
 					% if positive significant
-					if Channel{k}(j) >= t,
+					if chan(j) >= t,
 						Bitstream(ptr)   = 1;
 						Bitstream(ptr+1) = 0;
-						Remainder{k}(j) = Remainder{k}(j) - t;
+						rem(j) = rem(j) - t;
 
 						% if negative significant
-					elseif Channel{k}(j) <= -t,
+					elseif chan(j) <= -t,
 						Bitstream(ptr)   = 1;
 						Bitstream(ptr+1) = 1;
-						Remainder{k}(j) = Remainder{k}(j) + t;
+						rem(j) = rem(j) + t;
 
 						% if insignificant
 					else
@@ -71,14 +73,14 @@ function Bitstream = BitplaneEncoding(C1, C2, C3, maxIter)
 				else
 
 					% if positive refinement
-					if Remainder{k}(j) >= t,
+					if rem(j) >= t,
 						Bitstream(ptr) = 1;
-						Remainder{k}(j) = Remainder{k}(j) - t;
+						rem(j) = rem(j) - t;
 
 						% if negative refinement
 					elseif Remainder{k}(j) <= -t,
 						Bitstream(ptr) = 1;
-						Remainder{k}(j) = Remainder{k}(j) + t;
+						rem(j) = rem(j) + t;
 
 						% if no refinement
 					else
@@ -89,6 +91,7 @@ function Bitstream = BitplaneEncoding(C1, C2, C3, maxIter)
 
 			end
 			threshold(k) = threshold(k) /2; % update threshold
+			Remainder{k} = rem;
 		end
 	end
 	Bitstream = Bitstream(1:ptr-1,:);

@@ -35,23 +35,27 @@ function [C1, C2, C3] = BitplaneDecoding(Bitstream)
     p = pMax - 1;
     while ptr < length(Bitstream),
         for k = 1:d, % for every channel in turn
-            for c = 1:n(k), % for every pixel
+			
+			lup = Lookup{k};
+			chan = Channel{k};
+			
+			for c = 1:n(k), % for every pixel
 
                 % if pixel is significant, read two significance bits
-                if Lookup{k}(c) == 0
+                if lup(c) == 0
                     
                     % if significant
                     if Bitstream(ptr) == 1,
                         
                         % if positive significant
                         if Bitstream(ptr+1) == 0,
-                            Lookup{k}(c) = 1;
-                            Channel{k}(c) = th(k);
+                            lup(c) = 1;
+                            chan(c) = th(k);
                         
                         % if negative significant
                         else
-                            Lookup{k}(c) = 1;
-                            Channel{k}(c) = -th(k);
+                            lup(c) = 1;
+                            chan(c) = -th(k);
                         end
                         
                     % if insignificant    
@@ -70,13 +74,16 @@ function [C1, C2, C3] = BitplaneDecoding(Bitstream)
                 else
                     
                     if Bitstream(ptr) == 1
-                        Channel{k}(c) = Channel{k}(c) + sign(Channel{k}(c)) * th(k);
+                        chan(c) = chan(c) + sign(chan(c)) * th(k);
                     end
                     ptr = ptr+1;
                     
                 end
-            end
+			end
+			% update variables
             th(k) = th(k) /2; % adjust channel-specific threshold
+			Channel{k} = chan;
+			Lookup{k} = lup;
         end
     end
     
