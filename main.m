@@ -1,4 +1,3 @@
-
 function main(fname)
 %MAIN	Takes a 3D /RGB image, transforms it with YUV color transform, 
 %		Wavelet transform (Haar or Daubechies), and bit plane coding,
@@ -6,9 +5,9 @@ function main(fname)
 
 	% set default filename
 	if (nargin < 1)
-		filename = 'baboon.tiff';
+		%filename = 'baboon.tiff';
 		%filename = 'lena.tiff';
-		%filename = 'fault.jpg';
+		filename = 'fault.jpg';
 	else
 		filename = fname;
 	end
