@@ -30,7 +30,6 @@ to process your own image. Adapt main.m to skip parts, change the wavelet used e
 TeuxDeux
 -------
 * implement zero-tree coding
-* speed up bit plane coding
 * perform some analysis, e.g. PSNR, DR, average energy distribution
 * 
 
