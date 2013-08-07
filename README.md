@@ -1,5 +1,4 @@
-SIC
-===
+## sic
 
 A tiny toolbox for Still Image Coding as devised during some course work:
 
@@ -8,10 +7,9 @@ A tiny toolbox for Still Image Coding as devised during some course work:
 * bit plane coding
 * Haar wavelet transform
 * Daubechies wavelet transform
-* 
 
 
--------
+### Usage 
 
 In the MatLab console run
 
@@ -27,16 +25,7 @@ Or run
 to process your own image. Adapt main.m to skip parts, change the wavelet used etc.
 
 
-TeuxDeux
--------
+### TeuxDeux
+
 * implement zero-tree coding
-* perform some analysis, e.g. PSNR, DR, average energy distribution
-* 
-
-
-Author
--------
-Priska Herger
-
-License
--------
+* perform further analysis, e.g. PSNR, DR, average energy distribution
